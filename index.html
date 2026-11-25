@@ -1,0 +1,1979 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bitácora</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Prototipo de Bitácora: el historial técnico del auto asociado a su patente, para compradores, automotoras y talleres.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: app de una columna (máx. 1080px) con cabecera fija y cambio de rol; en el celular todo apila y los botones crecen */
+:root{
+  --head:#0B3A45; --head-ink:#EAF4F5; --head-2:rgb(234 244 245 / .10); --head-line:rgb(234 244 245 / .18);
+  --brand:#0E5868; --brand-strong:#0A4552; --brand-ink:#FFFFFF; --brand-soft:#E2EEF0;
+  --bg:#F2F5F5; --surface:#FFFFFF; --surface-2:#F6F9F9;
+  --ink:#0F2328; --ink-2:#465B61; --ink-3:#6B7F85; --line:#D6E0E2; --line-2:#E6EDEE;
+  --focus:#2E8FA3; --focus-ring:rgb(46 143 163 / .30);
+  --ok:#17784A; --ok-bg:#E3F3E9; --ok-line:#A6D8BA;
+  --prt:#1F55A6; --prt-bg:#E5EDFA; --prt-line:#B0C7EC;
+  --gap:#8F5600; --gap-bg:#FFF2D6; --gap-line:#E3AC48;
+  --risk:#B1261D; --risk-bg:#FCEAE8; --risk-line:#EFAAA3;
+  --own:#5C6A70; --own-bg:#ECF0F1; --own-line:#CCD5D8;
+  --plate-bg:#FFFFFF; --plate-ink:#121417; --plate-line:#1E2226; --plate-ph:#B4BCBF;
+  --paper:#FFFFFF; --paper-ink:#10232A; --paper-line:#D8E2E4; --paper-muted:#5B6E74;
+  --paper-gap:#8F5600; --paper-gap-bg:#FFF2D6; --paper-risk:#B1261D; --paper-ok:#17784A;
+  --mark-bg:#EAF4F5; --mark-ink:#0B3A45; --mark-ok:#1F9D61; --mark-prt:#2F6FD0; --mark-gap:#E29A1C;
+  --shadow:0 1px 2px rgb(11 58 69 / .06), 0 6px 20px rgb(11 58 69 / .07);
+  --backdrop:rgb(4 18 22 / .55);
+  --font-display:"Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body:"Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --head:#071F25; --head-ink:#DCEBEE; --head-2:rgb(220 235 238 / .08); --head-line:rgb(220 235 238 / .16);
+    --brand:#4FB0C2; --brand-strong:#7CC8D6; --brand-ink:#04222A; --brand-soft:#11353D;
+    --bg:#0B171A; --surface:#11242A; --surface-2:#0E1F24;
+    --ink:#E4EEF0; --ink-2:#A6BAC0; --ink-3:#7E959B; --line:#24424B; --line-2:#1A333B;
+    --focus:#6CC6D6; --focus-ring:rgb(108 198 214 / .30);
+    --ok:#5CC48E; --ok-bg:#10301F; --ok-line:#215A3B;
+    --prt:#86AEF0; --prt-bg:#122444; --prt-line:#2A4980;
+    --gap:#F1B54C; --gap-bg:#33250A; --gap-line:#7A5719;
+    --risk:#F38A80; --risk-bg:#3B1512; --risk-line:#742C26;
+    --own:#A2B0B5; --own-bg:#1C2B30; --own-line:#36484F;
+    --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 20px rgb(0 0 0 / .25);
+    --backdrop:rgb(0 0 0 / .62);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --head:#071F25; --head-ink:#DCEBEE; --head-2:rgb(220 235 238 / .08); --head-line:rgb(220 235 238 / .16);
+  --brand:#4FB0C2; --brand-strong:#7CC8D6; --brand-ink:#04222A; --brand-soft:#11353D;
+  --bg:#0B171A; --surface:#11242A; --surface-2:#0E1F24;
+  --ink:#E4EEF0; --ink-2:#A6BAC0; --ink-3:#7E959B; --line:#24424B; --line-2:#1A333B;
+  --focus:#6CC6D6; --focus-ring:rgb(108 198 214 / .30);
+  --ok:#5CC48E; --ok-bg:#10301F; --ok-line:#215A3B;
+  --prt:#86AEF0; --prt-bg:#122444; --prt-line:#2A4980;
+  --gap:#F1B54C; --gap-bg:#33250A; --gap-line:#7A5719;
+  --risk:#F38A80; --risk-bg:#3B1512; --risk-line:#742C26;
+  --own:#A2B0B5; --own-bg:#1C2B30; --own-line:#36484F;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 6px 20px rgb(0 0 0 / .25);
+  --backdrop:rgb(0 0 0 / .62);
+  color-scheme:dark;
+}
+
+/* ---------- Base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--head)}
+body.no-scroll{overflow:hidden}
+[hidden]{display:none!important}
+img{max-width:100%;display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.6rem,1.2rem + 1.9vw,2.4rem);font-stretch:108%;font-weight:760}
+h2{font-size:1.3rem;font-stretch:104%;font-weight:720}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ic{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.wrap{width:100%;max-width:1080px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.muted{color:var(--ink-2)}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.lead{font-size:1.06rem;color:var(--ink-2);max-width:60ch}
+.fine{font-size:.82rem;color:var(--ink-3);display:flex;gap:6px;align-items:flex-start}
+.fine .ic{margin-top:2px}
+.tx-ok{color:var(--ok)} .tx-gap{color:var(--gap)} .tx-risk{color:var(--risk)} .tx-own{color:var(--own)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* ---------- Cabecera y modo demo ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head);color:var(--head-ink)}
+.topbar-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding-block:10px}
+.logo{display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font-family:var(--font-display);font-weight:800;font-stretch:115%;font-size:1.28rem;letter-spacing:-.01em;border-radius:8px}
+.logo-mark{width:30px;height:30px;flex:none}
+.lm-bg{fill:var(--mark-bg)} .lm-rail,.lm-ln{stroke:var(--mark-ink);stroke-width:2.2;stroke-linecap:round;fill:none}
+.lm-d1{fill:var(--mark-ok)} .lm-d2{fill:var(--mark-prt)} .lm-d3{fill:var(--mark-gap)}
+.demo{display:flex;align-items:center;gap:10px}
+.demo-label{font-size:.66rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;opacity:.78;white-space:nowrap}
+.seg{display:flex;background:var(--head-2);border:1px solid var(--head-line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:inherit;padding:6px 14px;border-radius:999px;font-size:.88rem;font-weight:600;min-height:36px;white-space:nowrap}
+.seg button:hover{background:var(--head-2)}
+.seg button[aria-current="page"]{background:var(--head-ink);color:var(--head)}
+@media (max-width:640px){
+  .topbar-in{padding-block:8px 10px}
+  .demo{width:100%}
+  .seg{flex:1}
+  .seg button{flex:1;padding-inline:4px;font-size:.84rem}
+}
+
+main{padding-block:24px 56px;display:block}
+main:focus{outline:none}
+
+/* ---------- Botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:12px;border:1.5px solid transparent;font-weight:650;font-size:.98rem;line-height:1.2;text-decoration:none;text-align:center;transition:background-color .15s,border-color .15s,color .15s,transform .1s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--brand);color:var(--brand-ink)}
+.btn-primary:hover{background:var(--brand-strong)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.btn-lg{min-height:56px;font-size:1.05rem;padding-inline:22px;border-radius:14px}
+.btn-sm{min-height:38px;padding:6px 12px;font-size:.88rem;border-radius:10px}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.link-btn{background:none;border:0;padding:6px 0;color:var(--brand);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-align:left}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink);flex:none}
+.icon-btn .ic{width:20px;height:20px}
+
+/* ---------- Patente ---------- */
+.plate{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;background:var(--plate-bg);color:var(--plate-ink);border:2px solid var(--plate-line);border-radius:8px;padding:3px 12px 5px;line-height:1;white-space:nowrap;flex:none}
+.plate small{font-size:.5rem;font-weight:700;letter-spacing:.34em;padding-left:.34em;margin-bottom:2px}
+.plate b{font-family:var(--font-display);font-stretch:72%;font-weight:700;font-size:1.75rem;letter-spacing:.05em}
+.plate--sm{padding:2px 7px 3px;border-radius:5px;border-width:1.5px}
+.plate--sm small{font-size:.36rem;letter-spacing:.26em;padding-left:.26em;margin-bottom:1px}
+.plate--sm b{font-size:1.02rem}
+.plate-input{display:flex;flex-direction:column;align-items:center;background:var(--plate-bg);border:2.5px solid var(--plate-line);border-radius:12px;padding:5px 12px 6px;min-width:0}
+.plate-input small{font-size:.56rem;font-weight:700;letter-spacing:.36em;padding-left:.36em;color:var(--plate-ink)}
+.plate-input input{width:100%;min-width:0;border:0;background:transparent;text-align:center;font-family:var(--font-display);font-stretch:72%;font-weight:700;font-size:2.1rem;letter-spacing:.06em;color:var(--plate-ink);text-transform:uppercase;padding:0;line-height:1.15;outline:none}
+.plate-input input::placeholder{color:var(--plate-ph)}
+.plate-input:focus-within{box-shadow:0 0 0 4px var(--focus-ring)}
+.buscar-form{display:flex;flex-wrap:wrap;gap:10px;max-width:580px;margin-top:16px}
+.buscar-form .plate-input{flex:1 1 250px}
+.buscar-form .btn{flex:1 0 150px}
+.ejemplos{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;font-size:.88rem;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.85rem;color:var(--ink);min-height:36px}
+.chip b{font-family:var(--font-display);font-stretch:78%;font-weight:700;font-size:.98rem;letter-spacing:.04em}
+.chip span{color:var(--ink-3)}
+.chip:hover{border-color:var(--brand)}
+
+/* ---------- Tarjetas y avisos ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);min-width:0}
+@media (max-width:520px){.card{padding:16px;border-radius:16px}}
+.msg{display:flex;gap:14px;align-items:flex-start;margin-top:20px}
+.msg-ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--brand-soft);color:var(--brand)}
+.msg-ic .ic{width:22px;height:22px}
+.msg-body{display:grid;gap:8px;min-width:0}
+.msg-body .row{margin-top:6px}
+
+/* ---------- Landing ---------- */
+.hero{display:grid;gap:30px;grid-template-areas:"txt" "roles" "demo"}
+.hero-txt{grid-area:txt;display:flex;flex-direction:column;gap:14px;padding-top:6px}
+.hero-txt h1{font-size:clamp(2.15rem,1.3rem + 4vw,3.7rem);font-stretch:114%;font-weight:800;line-height:1.02;letter-spacing:-.025em;max-width:13ch}
+.hero-points{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.hero-points span{display:inline-flex;align-items:center;gap:6px;font-size:.86rem;font-weight:600;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+.roles{grid-area:roles;display:grid;gap:12px}
+.roles-title{font-size:1.05rem;font-stretch:100%;color:var(--ink-2);font-weight:650}
+.roles-grid{display:grid;gap:12px}
+.rol{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;min-width:0}
+.rol-top{display:flex;align-items:center;gap:12px}
+.rol-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand);flex:none}
+.rol-ic .ic{width:22px;height:22px}
+.rol-para{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3)}
+.rol-ben{font-size:1.02rem;flex:1}
+.rol .btn{justify-content:space-between}
+.hero-demo{grid-area:demo;min-width:0}
+.demo-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;--tl-bg:var(--surface)}
+.demo-card-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.demo-card-head .dc-veh{flex:1;min-width:0}
+.demo-card-head .dc-veh b{display:block;font-family:var(--font-display);font-size:1.05rem}
+.demo-card-head .dc-veh span{font-size:.84rem;color:var(--ink-2)}
+.demo-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:12px}
+@media (min-width:760px){.roles-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:920px){
+  .hero{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"txt demo" "roles roles";column-gap:56px;align-items:center}
+}
+
+/* ---------- Ficha del vehículo ---------- */
+.buscar h1{margin-top:6px}
+.ficha{display:flex;flex-direction:column;gap:18px;margin-top:26px;min-width:0}
+.ficha-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.ficha-veh{min-width:0}
+.ficha-veh h2{font-size:1.5rem}
+.ficha-veh .anio{color:var(--ink-3);font-weight:600}
+.ficha-veh p{color:var(--ink-2);font-size:.95rem}
+.alertas{display:flex;flex-direction:column;gap:10px}
+.alert{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1.5px solid;min-width:0}
+.alert > div{min-width:0}
+.alert-ic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--surface)}
+.alert-ic .ic{width:20px;height:20px;stroke-width:2.2}
+.alert-t{font-weight:750;font-size:1.04rem;line-height:1.3;margin-bottom:3px}
+.alert-s{font-size:.88rem;color:var(--ink-2);margin-top:4px}
+.alert-list{margin:4px 0 0;padding-left:18px;display:grid;gap:2px}
+.alert--risk{background:var(--risk-bg);border-color:var(--risk-line)} .alert--risk .alert-ic{background:var(--risk)} .alert--risk .alert-t{color:var(--risk);font-size:1.12rem}
+.alert--gap{background:var(--gap-bg);border-color:var(--gap-line)} .alert--gap .alert-ic{background:var(--gap)} .alert--gap .alert-t{color:var(--gap)}
+.alert--ok{background:var(--ok-bg);border-color:var(--ok-line)} .alert--ok .alert-ic{background:var(--ok)} .alert--ok .alert-t{color:var(--ok)}
+.ficha-grid{display:grid;gap:14px}
+@media (min-width:820px){.ficha-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}}
+.indice{display:flex;gap:16px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.indice-txt{min-width:0;flex:1}
+.ring{--c:var(--brand);--p:0;flex:none;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 1%),var(--line-2) 0);display:grid;place-items:center;position:relative}
+.ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--surface)}
+.ring span{position:relative;display:flex;align-items:baseline;gap:1px}
+.ring b{font-family:var(--font-display);font-size:1.95rem;font-weight:800;font-stretch:92%;line-height:1;font-variant-numeric:tabular-nums}
+.ring small{font-size:.72rem;color:var(--ink-3)}
+.ring--sm{width:60px;height:60px}
+.ring--sm::before{inset:6px}
+.ring--sm b{font-size:1.3rem}
+.ring--ok{--c:var(--ok)} .ring--gap{--c:var(--gap)} .ring--own{--c:var(--own)}
+.indice-label{font-weight:650;line-height:1.3}
+.indice-help{font-size:.9rem;color:var(--ink-2);margin-top:3px}
+.calc{margin-top:10px;font-size:.88rem}
+.calc summary{cursor:pointer;color:var(--brand);font-weight:650;list-style:none;display:inline-flex;align-items:center;gap:8px;min-height:32px}
+.calc summary::-webkit-details-marker{display:none}
+.calc summary::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.calc[open] summary::after{transform:translateY(1px) rotate(-135deg)}
+.calc-body{display:grid;gap:12px;margin-top:8px}
+.calc-top{display:flex;justify-content:space-between;gap:8px}
+.calc small{color:var(--ink-3);display:block;line-height:1.35}
+.calc-desc{font-weight:650;color:var(--gap)}
+.bar{height:6px;border-radius:99px;background:var(--line-2);overflow:hidden;margin:4px 0}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:inherit}
+.resumen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:0}
+.resumen > div{background:var(--surface);padding:12px 14px;min-width:0}
+.resumen dt{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:650}
+.resumen dd{margin:3px 0 0;font-family:var(--font-display);font-weight:750;font-size:1.25rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.resumen dd small{display:block;font-family:var(--font-body);font-weight:450;font-size:.8rem;color:var(--ink-2);margin-top:2px}
+.pay-card{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:16px 18px;border-radius:16px;background:var(--brand-soft);border:1px solid var(--line)}
+.pay-card p{max-width:54ch;font-size:.95rem}
+.pay-card b{display:block;font-size:1.02rem;margin-bottom:2px}
+.ficha-cta{display:flex;flex-wrap:wrap;gap:10px}
+[id],.hist,.ev,.step,.ficha{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 76px)}
+@media (max-width:640px){[id],.hist,.ev,.step,.ficha{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 112px)}}
+.hist{display:flex;flex-direction:column;gap:12px;min-width:0}
+.hist-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+.hist-head span{font-size:.86rem;color:var(--ink-3)}
+.hist-lock{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;padding:16px;border:1.5px dashed var(--line);border-radius:16px;text-align:center}
+
+/* Línea de tiempo */
+.tl{--tl-bg:var(--bg);list-style:none;margin:0;padding:0;position:relative}
+.modal .tl,.demo-card .tl{--tl-bg:var(--surface)}
+.tl > li{position:relative;padding-left:32px;padding-bottom:12px}
+.tl > li::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl > li:first-child::before{top:18px}
+.tl > li:last-child{padding-bottom:0}
+.tl > li:last-child::before{bottom:auto;height:18px}
+.tl > li:only-child::before{display:none}
+.ev-dot{position:absolute;left:3px;top:14px;width:16px;height:16px;border-radius:50%;background:var(--own);box-shadow:0 0 0 3px var(--tl-bg)}
+.sello-ok .ev-dot{background:var(--ok)} .sello-prt .ev-dot{background:var(--prt)} .sello-own .ev-dot{background:var(--own)}
+.ev--sin .ev-dot{background:var(--risk);box-shadow:0 0 0 3px var(--tl-bg),0 0 0 5px var(--risk-line)}
+.ev-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ev--sin .ev-card{background:var(--risk-bg);border:1.5px solid var(--risk-line)}
+.ev--nuevo .ev-card{box-shadow:0 0 0 3px var(--focus-ring);border-color:var(--brand)}
+.ev-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ev-top time{font-weight:700;font-variant-numeric:tabular-nums}
+.ev-km{font-family:var(--font-mono);font-size:.9rem;color:var(--ink-2);white-space:nowrap}
+.ev-km.is-lock{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-body);font-size:.8rem;color:var(--ink-3)}
+.ev-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tipo,.sello{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:650;padding:3px 9px;border-radius:999px;border:1px solid;line-height:1.35;white-space:nowrap}
+.tipo{background:var(--surface-2);border-color:var(--line);color:var(--ink)}
+.tipo--sin{background:var(--risk);border-color:var(--risk);color:var(--surface)}
+.sello--ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}
+.sello--prt{background:var(--prt-bg);color:var(--prt);border-color:var(--prt-line)}
+.sello--own{background:var(--own-bg);color:var(--own);border-color:var(--own-line)}
+.sello--gap{background:var(--gap-bg);color:var(--gap);border-color:var(--gap-line)}
+.sello--risk{background:var(--risk-bg);color:var(--risk);border-color:var(--risk-line)}
+.nuevo{font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-ink);background:var(--brand);border-radius:999px;padding:3px 9px}
+.ev-desc{font-size:.95rem}
+.ev-nota{display:flex;gap:6px;font-size:.88rem;color:var(--ink-2);font-style:italic}
+.ev-nota .ic{margin-top:2px}
+.ev-rep{font-size:.86rem;color:var(--ink-2)}
+.ev-rep span{font-weight:650;color:var(--ink)}
+.ev-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-size:.86rem;color:var(--ink-2)}
+.ev-monto{margin-left:auto;font-family:var(--font-mono);color:var(--ink);font-weight:600}
+.ev-flag{display:flex;gap:6px;align-items:flex-start;font-size:.85rem;font-weight:650;color:var(--risk);background:var(--surface);border:1px solid var(--risk-line);border-radius:10px;padding:6px 10px}
+.ev-flag .ic{margin-top:2px}
+.sk-group{display:flex;flex-direction:column;gap:7px}
+.sk{display:block;height:10px;border-radius:6px;background:var(--line-2)}
+.sk-lock{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3);margin-top:2px}
+.tl > li.tl-gap::before{background:repeating-linear-gradient(to bottom,var(--gap) 0 5px,transparent 5px 10px);width:3px;left:9.5px}
+.gap-card{display:flex;gap:10px;align-items:flex-start;background:var(--gap-bg);border:1.5px dashed var(--gap-line);border-radius:14px;padding:12px 14px}
+.gap-card > .ic{color:var(--gap);width:1.45em;height:1.45em;margin-top:1px}
+.gap-t{font-weight:750;color:var(--gap);line-height:1.3}
+.gap-s{font-size:.88rem;color:var(--ink-2)}
+.tl-ins{color:var(--ink-3);font-size:.86rem}
+.tl-ins .ins-dot{position:absolute;left:5px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--ink-3);background:var(--tl-bg)}
+.tl-ins p{padding-top:1px}
+.leyenda{border-top:1px solid var(--line);padding-top:14px}
+.leyenda-t{font-weight:700;font-size:.92rem}
+.leyenda ul{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:10px}
+.leyenda li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:.87rem;color:var(--ink-2)}
+@media (min-width:820px){.leyenda ul{grid-template-columns:1fr 1fr}}
+.vacio{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:20px;border:1.5px dashed var(--own-line);background:var(--own-bg);border-radius:16px}
+.vacio .ic-big{width:40px;height:40px;color:var(--own)}
+.vacio p{max-width:62ch}
+
+/* Barra fija de pago en el celular */
+.paybar{display:none}
+@media (max-width:759px){
+  .paybar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;align-items:center;justify-content:space-between;gap:12px;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgb(4 18 22 / .10)}
+  .paybar div{min-width:0;line-height:1.25}
+  .paybar b{display:block;font-size:.95rem}
+  .paybar small{color:var(--ink-2);font-size:.8rem}
+  .paybar .btn{flex:none}
+  body.has-paybar .foot{padding-bottom:92px}
+}
+
+/* ---------- Paneles de automotora y taller ---------- */
+.dash-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 24px;margin-bottom:18px}
+.dash-head > div:first-child{min-width:0}
+.dash-head h1{font-size:clamp(1.5rem,1.2rem + 1.4vw,2.1rem);margin-top:4px}
+.uso{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;width:min(100%,300px)}
+.uso-t{font-size:.92rem;color:var(--ink-2)}
+.uso-t b{font-family:var(--font-display);font-size:1.25rem;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.uso .bar{height:8px;margin:8px 0 6px}
+.uso .bar.is-alto i{background:var(--gap)}
+.uso-s{font-size:.78rem;color:var(--ink-3)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 14px;font-weight:650;color:var(--ink-2);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;gap:6px;align-items:center;min-height:48px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+.count{font-size:.74rem;background:var(--brand-soft);color:var(--brand);border-radius:999px;padding:1px 8px;font-weight:700}
+.stock-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.stock-sum > div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.stock-sum b{display:block;font-family:var(--font-display);font-size:1.35rem;font-weight:800;line-height:1.2}
+.stock-sum span{font-size:.8rem;color:var(--ink-2);line-height:1.3;display:block}
+.table-wrap{display:none}
+.stock-cards{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+@media (min-width:880px){
+  .table-wrap{display:block;overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+  .stock-cards{display:none}
+}
+.stock-table{width:100%;border-collapse:collapse;font-size:.93rem}
+.stock-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.stock-table td{padding:12px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.stock-table tr:last-child td{border-bottom:0}
+.stock-table .modelo b{display:block;white-space:nowrap}
+.stock-table .acciones{flex-wrap:nowrap}
+.stock-table .modelo span{font-size:.82rem;color:var(--ink-3)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.idx{display:flex;align-items:center;gap:8px;min-width:110px}
+.idx .bar{flex:1;max-width:74px;margin:0}
+.idx b{font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.idx--ok .bar i{background:var(--ok)} .idx--gap .bar i{background:var(--gap)} .idx--own .bar i{background:var(--own)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.pill--con{background:var(--brand-soft);color:var(--brand)}
+.pill--sin{background:var(--own-bg);color:var(--own);border-color:var(--own-line)}
+.pill--cert{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}
+.pill--demo{background:var(--gap-bg);color:var(--gap);border-color:var(--gap-line)}
+.acciones{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.stock-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:12px;min-width:0}
+.sc-top{display:flex;align-items:center;gap:12px;min-width:0}
+.sc-top div{min-width:0}
+.sc-top b{display:block;font-family:var(--font-display)}
+.sc-top span{font-size:.84rem;color:var(--ink-2)}
+.sc-mid{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sc-precio{font-family:var(--font-display);font-weight:800;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.sc-precio small{display:block;font-family:var(--font-body);font-weight:500;font-size:.74rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.sc-bot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-bot .acciones{flex:1}
+.retoma-intro{max-width:62ch}
+.veredicto{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:16px;border:1.5px solid;margin-top:22px}
+.veredicto > div{min-width:0}
+.veredicto .alert-ic{color:var(--surface)}
+.veredicto-t{font-weight:800;font-size:1.1rem;line-height:1.3}
+.veredicto p{margin-top:3px}
+.veredicto ul{margin:6px 0 0;padding-left:18px;font-size:.93rem}
+.veredicto--ok{background:var(--ok-bg);border-color:var(--ok-line)} .veredicto--ok .veredicto-t{color:var(--ok)} .veredicto--ok .alert-ic{background:var(--ok)}
+.veredicto--gap{background:var(--gap-bg);border-color:var(--gap-line)} .veredicto--gap .veredicto-t{color:var(--gap)} .veredicto--gap .alert-ic{background:var(--gap)}
+.veredicto-risk{display:flex;gap:8px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--risk-bg);border:1px solid var(--risk-line);color:var(--risk);font-weight:650;font-size:.92rem}
+.veredicto-risk .ic{margin-top:2px}
+.planes{display:grid;gap:18px;margin-top:8px;max-width:820px}
+@media (min-width:720px){.planes{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}}
+.plan-clp{font-size:.9rem;color:var(--ink-2);margin-top:-8px;font-variant-numeric:tabular-nums}
+.suelto{display:flex;gap:10px;align-items:flex-start;margin-top:18px;max-width:820px;padding:14px 16px;border:1.5px dashed var(--line);border-radius:14px;background:var(--surface)}
+.suelto .ic{color:var(--brand);width:22px;height:22px;margin-top:1px}
+.cert-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:var(--ok-bg);border:1.5px solid var(--ok-line)}
+.cert-note > .ic{color:var(--ok);width:24px;height:24px;margin-top:1px}
+.cert-note > div{min-width:0}
+.cert-note b{display:block;color:var(--ok);font-size:1.02rem;line-height:1.3}
+.cert-note span{display:block;font-size:.86rem;color:var(--ink-2);margin-top:2px;overflow-wrap:anywhere}
+.toma{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.toma > .ic{color:var(--brand);width:22px;height:22px;margin-top:1px}
+.toma p{margin:0;min-width:0}
+.toma b{font-family:var(--font-display);font-size:1.08rem;white-space:nowrap}
+.toma small{display:block;color:var(--ink-3);font-size:.8rem;margin-top:2px}
+.toma--lock{align-items:center;flex-wrap:wrap;color:var(--ink-2)}
+.toma--lock > .ic{color:var(--ink-3);margin-top:0}
+.toma--lock p{flex:1 1 200px}
+.tab .ic{width:1em;height:1em}
+.tab-corto{display:none}
+@media (max-width:520px){
+  .tab{padding-inline:7px;font-size:.93rem}
+  .tab-largo{display:none} .tab-corto{display:inline}
+}
+.ins-lock{max-width:720px;margin-top:0}
+.ins-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+@media (min-width:880px){.ins-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ins-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:12px;align-content:start;min-width:0}
+.ins-card .sc-top{flex-wrap:wrap;row-gap:8px}
+.ins-card .sc-top > div{flex:1 1 150px}
+.pill--sobre{background:var(--gap-bg);color:var(--gap);border-color:var(--gap-line)}
+.ins-dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:0}
+.ins-dl dt{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:650}
+.ins-dl dd{margin:2px 0 0;font-family:var(--font-display);font-weight:750;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.ins-dl dd small{display:block;font-family:var(--font-body);font-weight:450;font-size:.78rem;color:var(--ink-3)}
+.ins-rango{grid-column:1 / -1}
+.rbar{position:relative;height:8px;border-radius:99px;background:var(--line-2);margin:2px 0}
+.rbar i{position:absolute;top:0;bottom:0;border-radius:99px;background:var(--brand);opacity:.5}
+.rbar b{position:absolute;top:-5px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:var(--ink)}
+.ins-pos{font-size:.9rem;font-weight:600}
+.ins-pos--gap{color:var(--gap)} .ins-pos--ok{color:var(--ok)} .ins-pos--own{color:var(--ink-2)}
+.ins-alert{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;background:var(--gap-bg);border:1px solid var(--gap-line);border-radius:12px;padding:8px 12px}
+.ins-alert .ic{color:var(--gap);margin-top:2px}
+.plan{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.plan--actual{border:2px solid var(--brand);box-shadow:var(--shadow)}
+.plan-badge{position:absolute;top:-12px;left:18px;background:var(--brand);color:var(--brand-ink);font-size:.74rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.plan-precio b{font-family:var(--font-display);font-size:1.85rem;font-weight:800;font-variant-numeric:tabular-nums}
+.plan-precio span{color:var(--ink-3);font-size:.88rem}
+.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;flex:1;align-content:start}
+.plan li{display:flex;gap:8px;align-items:flex-start;font-size:.93rem}
+.plan li .ic{color:var(--ok);margin-top:3px}
+.planes-nota{margin-top:14px}
+
+.highlight{display:inline-flex;align-items:center;gap:8px;background:var(--brand-soft);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600}
+.highlight .ic{color:var(--brand)}
+.highlight b{color:var(--brand);font-size:1.1rem}
+.taller-grid{display:grid;gap:16px}
+@media (min-width:920px){
+  .taller-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-areas:"reg ganas" "reg list";align-items:start}
+  .reg{grid-area:reg}.ganas{grid-area:ganas}.registros{grid-area:list}
+}
+.reg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.reg-head p{font-size:.92rem}
+.timer{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.9rem;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;color:var(--ink-2);flex:none;font-variant-numeric:tabular-nums}
+.timer.is-run{color:var(--brand);border-color:var(--brand)}
+.step{display:flex;flex-direction:column;gap:10px;padding:16px 0;border-top:1px solid var(--line-2);min-width:0}
+.step:first-child{border-top:0;padding-top:4px}
+.step-label{display:flex;align-items:center;gap:10px;font-weight:700}
+.step-n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:var(--brand-ink);font-size:.85rem;font-weight:800;flex:none}
+.step.is-done .step-n{background:var(--ok)}
+.step.is-off{opacity:.5}
+.step.is-off .upload{cursor:not-allowed}
+.hint{font-size:.9rem;color:var(--ink-2);display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tveh{display:inline-flex;align-items:flex-start;gap:6px}
+.tveh .ic{margin-top:3px;color:var(--brand)}
+.tveh--nuevo{color:var(--gap)} .tveh--nuevo .ic{color:var(--gap)}
+.tveh--warn{color:var(--gap);font-weight:600}
+.upload{display:flex;align-items:center;gap:14px;min-height:78px;padding:14px 18px;border:2px dashed var(--brand);border-radius:16px;background:var(--brand-soft);color:var(--ink);cursor:pointer}
+.upload:hover{border-style:solid}
+.upload .ic{width:32px;height:32px;color:var(--brand)}
+.upload b{display:block;font-size:1.05rem;line-height:1.3}
+.upload small{color:var(--ink-2);font-size:.86rem}
+.upload:focus-within{box-shadow:0 0 0 4px var(--focus-ring)}
+.ot-wrap{display:flex;gap:14px;align-items:center;min-width:0}
+.ot-prev{position:relative;width:90px;height:120px;border-radius:10px;overflow:hidden;border:1px solid var(--line);flex:none;background:var(--surface-2)}
+.ot-prev img{width:100%;height:100%;object-fit:cover}
+.scanline{position:absolute;left:0;right:0;top:0;height:3px;background:var(--brand);box-shadow:0 0 12px 3px var(--brand);animation:scan 1s ease-in-out infinite alternate}
+@keyframes scan{to{transform:translateY(117px)}}
+.leyendo{display:flex;gap:12px;align-items:center;min-width:0}
+.leyendo b{display:block}
+.leyendo small{color:var(--ink-2)}
+.ot-ok{display:grid;gap:4px;min-width:0}
+.ot-ok b{display:flex;align-items:center;gap:6px;color:var(--ok)}
+.spin{width:24px;height:24px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:spin .8s linear infinite;flex:none;display:inline-block}
+.spin--sm{width:18px;height:18px;border-width:2.5px}
+.btn-primary .spin{border-color:rgb(255 255 255 / .35);border-top-color:var(--brand-ink)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-note{display:flex;gap:8px;align-items:flex-start;font-size:.9rem;background:var(--brand-soft);border-radius:12px;padding:10px 12px}
+.ai-note .ic{color:var(--brand);margin-top:2px}
+.fields{display:grid;gap:12px}
+@media (min-width:520px){.fields{grid-template-columns:1fr 1fr}.f--full{grid-column:1 / -1}}
+.f{display:flex;flex-direction:column;gap:5px;font-size:.86rem;font-weight:650;color:var(--ink-2);min-width:0}
+.f small{font-weight:450;color:var(--ink-3)}
+.f input,.f select,.f textarea{font-size:16px;font-weight:450;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:46px;width:100%;min-width:0}
+.f textarea{resize:vertical;line-height:1.4}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--focus-ring)}
+.f .ai{background:var(--brand-soft);border-color:var(--brand)}
+.f .is-err{border-color:var(--risk)}
+.f-warn{font-size:.82rem;font-weight:600;color:var(--gap)}
+.voz{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.rec{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px;border:1px solid var(--brand);background:var(--brand-soft);border-radius:12px;font-family:var(--font-mono);font-size:.9rem;width:100%}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:var(--risk);animation:pulse 1s ease-in-out infinite;flex:none}
+@keyframes pulse{50%{opacity:.25}}
+.rec-bars{display:flex;gap:3px;align-items:center;height:22px;flex:1}
+.rec-bars i{width:4px;height:100%;background:var(--brand);border-radius:2px;animation:bars .9s ease-in-out infinite}
+.rec-bars i:nth-child(2){animation-delay:.12s}.rec-bars i:nth-child(3){animation-delay:.24s}.rec-bars i:nth-child(4){animation-delay:.36s}.rec-bars i:nth-child(5){animation-delay:.48s}.rec-bars i:nth-child(6){animation-delay:.6s}
+@keyframes bars{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+.form-err{display:flex;gap:8px;align-items:flex-start;color:var(--risk);font-weight:650;font-size:.92rem;background:var(--risk-bg);border:1px solid var(--risk-line);border-radius:12px;padding:10px 12px}
+.reg-submit{margin-top:6px}
+.exito{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.exito-ic{width:56px;height:56px;border-radius:50%;background:var(--ok);color:var(--surface);display:grid;place-items:center;flex:none}
+.exito-ic .ic{width:30px;height:30px;stroke-width:2.6}
+.exito-veh{display:flex;align-items:center;gap:10px;font-weight:650}
+.exito-idx{font-size:1rem}
+.exito-idx b{font-family:var(--font-display);font-size:1.25rem}
+.ganas h2{margin-bottom:12px}
+.ganas-hero{display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;background:var(--brand-soft);margin-bottom:16px}
+.ganas-hero > b{font-family:var(--font-display);font-size:3.2rem;font-weight:800;line-height:1;color:var(--brand);font-variant-numeric:tabular-nums}
+.ganas-t{font-weight:750;font-size:1.06rem;line-height:1.25}
+.ganas-hero p + p{font-size:.88rem;color:var(--ink-2);margin-top:2px}
+.ganas-list{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.ganas-list li{display:flex;gap:10px}
+.ganas-list li > .ic{color:var(--brand);width:22px;height:22px;margin-top:1px}
+.ganas-list b{display:block;line-height:1.3}
+.ganas-list span{font-size:.88rem;color:var(--ink-2)}
+.ganas-msg{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2);font-size:.95rem;font-weight:550}
+.mini-h{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:18px}
+.leads{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.lead-it{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:.88rem}
+.lead-it b{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.93rem}
+.lead-it span{color:var(--ink-2)}
+.reg-list{list-style:none;margin:10px 0 0;padding:0}
+.reg-it{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-2)}
+.reg-it:first-child{border-top:0}
+.ri-main{min-width:0;flex:1}
+.ri-main b{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.93rem}
+.ri-main span{font-size:.82rem;color:var(--ink-2)}
+.ri-side{text-align:right;font-size:.84rem;font-variant-numeric:tabular-nums;color:var(--ink-2);flex:none}
+.ri-side b{display:block;color:var(--ink);font-family:var(--font-mono);font-weight:600}
+
+/* ---------- Modal ---------- */
+#modal-root{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal-backdrop{position:absolute;inset:0;background:var(--backdrop)}
+.modal{position:relative;background:var(--surface);color:var(--ink);width:100%;max-height:calc(100% - 20px - env(safe-area-inset-top,0px));display:flex;flex-direction:column;border-radius:20px 20px 0 0;box-shadow:0 -10px 40px rgb(0 0 0 / .22);animation:sheet .24s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheet{from{transform:translateY(24px);opacity:.4}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:12px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line)}
+.modal-head h2{font-size:1.15rem}
+.modal-body{overflow:auto;overscroll-behavior:contain;padding-top:18px;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.modal-body .ficha{margin-top:0}
+.modal-lead{color:var(--ink-2);font-size:.95rem}
+@media (min-width:720px){
+  #modal-root{align-items:center;padding:24px}
+  .modal{max-width:620px;border-radius:20px;max-height:calc(100vh - 48px)}
+  .modal--wide{max-width:900px}
+  .modal-body{padding-bottom:24px}
+}
+.talleres{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.taller{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px;border:1px solid var(--line);border-radius:14px}
+.taller-info{min-width:0;flex:1 1 260px;display:grid;gap:3px}
+.taller-info h3{font-size:1rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.taller-loc{display:flex;align-items:center;gap:4px;color:var(--brand);font-weight:650;font-size:.88rem}
+.taller-info .muted{font-size:.84rem}
+.taller-ok{color:var(--ok);font-weight:700;display:inline-flex;gap:6px;align-items:center;font-size:.9rem}
+.badge-rec{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ok);background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:999px;padding:1px 8px}
+.pay{display:grid;gap:16px}
+.pay-veh{display:flex;align-items:center;gap:12px}
+.pay-veh p{font-size:.88rem}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.checks li{display:flex;gap:8px;align-items:flex-start}
+.checks .ic{color:var(--ok);margin-top:3px}
+.pay-total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.pay-total b{font-family:var(--font-display);font-size:1.9rem;font-weight:800}
+.pay-methods{border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0}
+.pay-methods legend{font-weight:700;margin-bottom:8px;font-size:.92rem;padding:0}
+.pm{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;min-height:50px}
+.pm:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.pm input{accent-color:var(--brand);width:18px;height:18px;margin:0}
+.pay-ok{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:10px 0}
+
+/* ---------- Certificado (siempre en papel claro) ---------- */
+.cert{background:var(--paper);color:var(--paper-ink);border:1px solid var(--paper-line);border-radius:14px;padding:22px;display:grid;gap:16px;font-size:.92rem;min-width:0;--mark-bg:var(--paper-ink);--mark-ink:var(--paper)}
+@media (max-width:520px){.cert{padding:16px}}
+.cert-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:2px solid var(--paper-ink)}
+.cert-brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:800;font-stretch:115%;font-size:1.2rem}
+.cert-code{text-align:right}
+.cert-code small{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;color:var(--paper-muted)}
+.cert-code b{font-family:var(--font-mono);font-size:.92rem;font-weight:600}
+.cert-title{font-size:1.3rem;font-stretch:108%}
+.cert-veh{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cert-name{font-family:var(--font-display);font-weight:750;font-size:1.15rem}
+.cert-veh p + p{color:var(--paper-muted)}
+.cert-grid{display:grid;gap:14px}
+@media (min-width:640px){.cert-grid{grid-template-columns:190px minmax(0,1fr)}}
+.cert-indice{border:1px solid var(--paper-line);border-radius:12px;padding:14px;display:grid;gap:4px;align-content:start}
+.cert-score{font-family:var(--font-display);font-size:3rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.cert-score small{font-size:1rem;color:var(--paper-muted);font-weight:600}
+.cert-indice small{color:var(--paper-muted);line-height:1.35}
+.cert-dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin:0}
+.cert-dl dt{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--paper-muted)}
+.cert-dl dd{margin:2px 0 0;font-weight:700;font-variant-numeric:tabular-nums}
+.cert-dl dd small{font-weight:500;color:var(--paper-muted)}
+.cert-adv{border:1.5px solid var(--paper-gap);background:var(--paper-gap-bg);border-radius:12px;padding:12px 14px;color:var(--paper-ink)}
+.cert-adv b{color:var(--paper-gap)}
+.cert-adv ul{margin:6px 0 0;padding-left:18px}
+.cert-adv li.risk{color:var(--paper-risk);font-weight:650}
+.cert-okline{color:var(--paper-ok);font-weight:650}
+.cert-tabla-wrap{overflow-x:auto}
+.cert-tabla{width:100%;border-collapse:collapse;font-size:.84rem}
+.cert-tabla caption{text-align:left;font-weight:700;padding-bottom:6px}
+.cert-tabla th{text-align:left;font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--paper-muted);font-weight:700}
+.cert-tabla th,.cert-tabla td{padding:7px 8px 7px 0;border-bottom:1px solid var(--paper-line);white-space:nowrap}
+.cert-foot{display:flex;gap:14px;align-items:center;padding-top:12px;border-top:1px solid var(--paper-line);font-size:.82rem;color:var(--paper-muted)}
+.cert-foot div{display:grid;gap:4px;min-width:0}
+.qr{width:92px;height:92px;flex:none}
+.cert-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.cert-copy{width:100%;margin-top:10px;font-family:var(--font-mono);font-size:.82rem;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);min-height:150px}
+
+/* ---------- Pie y aviso flotante ---------- */
+.foot{border-top:1px solid var(--line);background:var(--surface)}
+.foot-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding-block:20px}
+.foot-brand{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.88rem;color:var(--ink-2)}
+.foot-brand b{font-family:var(--font-display);font-stretch:115%;color:var(--ink)}
+.foot-brand .logo-mark{width:24px;height:24px;--mark-bg:var(--head);--mark-ink:var(--head-ink)}
+.foot-demo{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);flex:1 1 320px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);opacity:0;z-index:60;background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:.92rem;font-weight:600;box-shadow:var(--shadow);transition:opacity .2s,transform .2s;width:max-content;max-width:calc(100% - 32px);text-align:center}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+body.has-paybar .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+
+#print-root{display:none}
+@media print{
+  body{background:#fff}
+  body::before{display:none}
+  body > *:not(#print-root){display:none!important}
+  #print-root{display:block!important}
+  #print-root .cert{border:0;padding:0;font-size:10.5pt}
+  @page{margin:14mm}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.3 5.3L3.5 17.5a1.4 1.4 0 0 0 0 2l1 1a1.4 1.4 0 0 0 2 0l5.9-5.9a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.3-.6-.6-2.3z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M2.5 12h3M18.5 12h3M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.2 2.6 17.6A2 2 0 0 0 4.3 20.6h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.5M12 17.2h.01"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3H9zM9 11.5h6M9 15.5h4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z"/><path d="m8.8 12 2.3 2.3 4.3-4.6"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M3.5 17a8.5 8.5 0 1 1 17 0"/><path d="m12 17 3.8-5.2"/><path d="M6.2 13.2l1.2.7M12 8.5v1.3M17.8 13.2l-1.2.7"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.4-3.7 4.3-5.5 7.5-5.5s6.1 1.8 7.5 5.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.2-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3.2l1.8-2.8h6l1.8 2.8H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4.5 11.5 6.4 6.6A2 2 0 0 1 8.3 5.3h7.4a2 2 0 0 1 1.9 1.3l1.9 4.9"/><rect x="3" y="11.5" width="18" height="6" rx="1.6"/><path d="M5.5 17.5v2M18.5 17.5v2M7 14.5h1M16 14.5h1"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M3.5 9.5 5.2 4.5h13.6l1.7 5"/><path d="M4.5 9.5V20h15V9.5"/><path d="M3.5 9.5h17"/><path d="M9.5 20v-5.5h5V20"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M15.5 8.5V5.5a1.5 1.5 0 0 0-1.5-1.5H5.5A1.5 1.5 0 0 0 4 5.5V14a1.5 1.5 0 0 0 1.5 1.5h3"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v6.5H7z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14 3v5h5M9 13h6.5M9 16.5h4.5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.2 14.9c1.7.8 2.8 2.4 3.3 5.1"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
+  <symbol id="i-calx" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4M10 13l4 4M14 13l-4 4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 4.5l1.7 4.8 4.8 1.7-4.8 1.7L11 17.5l-1.7-4.8-4.8-1.7 4.8-1.7z"/><path d="M18.5 3v3.5M16.8 4.75h3.5M18 16v3M16.5 17.5h3"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 1 0-2.4 5.8"/><path d="M20.5 4.5v6.5H14"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3.5 17 9 11.5l4 4L20.5 8"/><path d="M15 8h5.5v5.5"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 10.5h10.6L20.5 7H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="logo" href="#inicio" aria-label="Bitácora, ir al inicio">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect class="lm-bg" width="32" height="32" rx="9"/><path class="lm-rail" d="M11 9v14"/><circle class="lm-d1" cx="11" cy="9" r="3.3"/><circle class="lm-d2" cx="11" cy="16" r="3.3"/><circle class="lm-d3" cx="11" cy="23" r="3.3"/><path class="lm-ln" d="M17.5 9h7M17.5 16h5M17.5 23h6"/></svg>
+      <span>Bitácora</span>
+    </a>
+    <nav class="demo" aria-label="Modo demo: cambiar de rol">
+      <span class="demo-label">Modo demo</span>
+      <div class="seg">
+        <button type="button" data-go="comprador">Comprador</button>
+        <button type="button" data-go="automotora">Automotora</button>
+        <button type="button" data-go="taller">Taller</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="app" class="wrap" tabindex="-1"></main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect class="lm-bg" width="32" height="32" rx="9"/><path class="lm-rail" d="M11 9v14"/><circle class="lm-d1" cx="11" cy="9" r="3.3"/><circle class="lm-d2" cx="11" cy="16" r="3.3"/><circle class="lm-d3" cx="11" cy="23" r="3.3"/><path class="lm-ln" d="M17.5 9h7M17.5 16h5M17.5 23h6"/></svg>
+      <b>Bitácora</b><span>Prototipo para entrevistas de validación</span>
+    </div>
+    <p class="foot-demo"><span class="pill pill--demo">Datos de demostración</span> Patentes, autos, talleres, montos y planes son inventados. Los pagos y la lectura con IA son simulados.</p>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-reset" data-action="reset"><svg class="ic" aria-hidden="true"><use href="#i-refresh"></use></svg><span>Reiniciar demo</span></button>
+  </div>
+</footer>
+
+<div id="modal-root" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="print-root" aria-hidden="true"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ================= Utilidades ================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ESC[c]);
+const miles = n => String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const clp = n => '$' + miles(n);
+const kms = n => miles(n) + ' km';
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const pad = n => String(n).padStart(2, '0');
+const toISO = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const parseISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const fecha = iso => { const [y, m, d] = iso.split('-'); return d + '-' + m + '-' + y; };
+const HOY = toISO(new Date());
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const mesAnio = iso => { const d = parseISO(iso); return MESES[d.getMonth()] + ' de ' + d.getFullYear(); };
+function meses(a, b) { const A = parseISO(a), B = parseISO(b); return (B.getFullYear() - A.getFullYear()) * 12 + (B.getMonth() - A.getMonth()) + (B.getDate() - A.getDate()) / 30.44; }
+function mesesTxt(m) {
+  const r = Math.max(1, Math.round(m));
+  if (r < 24) return r + (r === 1 ? ' mes' : ' meses');
+  const a = Math.floor(r / 12), mm = r % 12;
+  return a + ' años' + (mm ? ' y ' + mm + (mm === 1 ? ' mes' : ' meses') : '');
+}
+const normP = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const validP = p => /^[A-Z]{4}\d{2}$/.test(p) || /^[A-Z]{2}\d{4}$/.test(p);
+const fmtP = p => (normP(p).slice(0, 6).match(/.{1,2}/g) || []).join('·');
+const ic = (n, c) => '<svg class="ic' + (c ? ' ' + c : '') + '" aria-hidden="true" focusable="false"><use href="#i-' + n + '"></use></svg>';
+const regs = n => n + (n === 1 ? ' registro' : ' registros');
+const losRegs = n => (n === 1 ? 'del único registro' : 'de los ' + n + ' registros');
+const revs = n => n + (n === 1 ? ' revisión técnica' : ' revisiones técnicas');
+const nombreVeh = v => (v.modelo.indexOf(v.marca) === 0 ? v.modelo : v.marca + ' ' + v.modelo);
+const parseNum = s => { const n = parseInt(String(s).replace(/[^\d]/g, ''), 10); return isNaN(n) ? null : n; };
+function parseFecha(s) {
+  const m = String(s).trim().match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+  if (!m) return null;
+  const d = +m[1], mo = +m[2], y = +m[3], dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return toISO(dt);
+}
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
+const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scrollToEl = el => el && el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+
+/* ================= Datos de demostración ================= */
+const TALLERES = {
+  soto:        { nombre: 'Taller Mecánico Hermanos Soto', comuna: 'Ñuñoa', esp: 'Mantención general y frenos', dist: 4.1, registros: 312, precompra: 34990, desde: '2025-03-01' },
+  andes:       { nombre: 'Automotriz Los Andes', comuna: 'Providencia', esp: 'Motor y cajas automáticas', dist: 3.2, registros: 268, precompra: 39990 },
+  granavenida: { nombre: 'Servicio Automotriz Gran Avenida', comuna: 'San Miguel', esp: 'Mantenciones por kilometraje', dist: 6.8, registros: 221, precompra: 32990 },
+  vicuna:      { nombre: 'Electro Diésel Vicuña', comuna: 'La Florida', esp: 'Electricidad y diagnóstico computarizado', dist: 9.6, registros: 154, precompra: 29990 },
+  pajaritos:   { nombre: 'Carrocería y Pintura Pajaritos', comuna: 'Maipú', esp: 'Desabolladura, pintura y estructura', dist: 12.3, registros: 97, precompra: 44990 }
+};
+const MI_TALLER = 'soto';
+
+const VEHICULOS = [
+  // precio: publicado por la automotora · mercado: valor de referencia del modelo y año (simulado) · dias: días en stock
+  { patente: 'KZPW38', marca: 'Toyota', modelo: 'Yaris', anio: 2019, color: 'Gris plata', inscripcion: '2019-03-15', precio: 10490000, mercado: 10500000, dias: 12 },
+  { patente: 'JXTR61', marca: 'Hyundai', modelo: 'Accent', anio: 2018, color: 'Blanco', inscripcion: '2018-06-12', precio: 8290000, mercado: 8600000, dias: 58 },
+  { patente: 'HBLS27', marca: 'Chevrolet', modelo: 'Sail', anio: 2016, color: 'Rojo', inscripcion: '2016-02-18', precio: 5990000, mercado: 5900000, dias: 71 },
+  { patente: 'JKWD84', marca: 'Nissan', modelo: 'Versa', anio: 2017, color: 'Azul', inscripcion: '2017-04-05', precio: 7190000, mercado: 7300000, dias: 49 },
+  { patente: 'LFGH19', marca: 'Kia', modelo: 'Morning', anio: 2020, color: 'Negro', inscripcion: '2020-09-01', precio: 6490000, mercado: 6700000, dias: 23 },
+  { patente: 'PRBX55', marca: 'Suzuki', modelo: 'Swift', anio: 2021, color: 'Blanco perla', inscripcion: '2021-07-20', precio: 9790000, mercado: 9600000, dias: 8 },
+  { patente: 'RSKT09', marca: 'MG', modelo: 'MG3', anio: 2022, color: 'Gris', inscripcion: '2022-08-10', precio: 8990000, mercado: 9100000, dias: 34 },
+  { patente: 'KFPZ66', marca: 'Peugeot', modelo: '208', anio: 2018, color: 'Gris platino', inscripcion: '2018-05-22', precio: 7490000, mercado: 7600000, dias: 63 },
+  { patente: 'LCXR58', marca: 'Suzuki', modelo: 'Baleno', anio: 2020, color: 'Azul', inscripcion: '2020-02-10', mercado: 9700000 },
+  { patente: 'KDSV12', marca: 'Kia', modelo: 'Rio 5', anio: 2018, color: 'Gris oscuro', inscripcion: '2018-03-08', mercado: 7700000 },
+  { patente: 'HJBD20', marca: 'Chevrolet', modelo: 'Spark GT', anio: 2015, color: 'Blanco', inscripcion: '2015-07-14', mercado: 4600000 }
+];
+const VEH = {}; VEHICULOS.forEach(v => { VEH[v.patente] = v; });
+const STOCK = ['KZPW38', 'JXTR61', 'HBLS27', 'JKWD84', 'LFGH19', 'PRBX55', 'RSKT09', 'KFPZ66'];
+const EJ_COMPRADOR = ['KZPW38', 'JXTR61', 'HBLS27', 'JKWD84', 'LFGH19'];
+const EJ_RETOMA = ['LCXR58', 'KDSV12', 'HJBD20'];
+
+function E(f, km, tipo, sello, taller, desc, rep, monto, extra) {
+  return Object.assign({ fecha: f, km: km, tipo: tipo, sello: sello, taller: taller, desc: desc, rep: rep || [], monto: monto == null ? null : monto }, extra || {});
+}
+const PRT = (f, km, comuna, desc) => E(f, km, 'prt', 'prt', 'Planta de revisión técnica · ' + comuna, desc || 'Revisión técnica aprobada. Kilometraje registrado en la planta.');
+const DUENO = (f, km, tipo, lugar, desc) => E(f, km, tipo, 'dueno', lugar + ' (informado por el dueño)', desc);
+const ACEITE_T = 'Aceite 0W-20 sintético (3,7 L)', ACEITE = 'Aceite 5W-30 sintético (4 L)';
+
+const BASE = {
+  KZPW38: [
+    E('2019-09-14', 10120, 'mant', 'taller', 'granavenida', 'Mantención de 10.000 km: cambio de aceite y filtro, revisión de 21 puntos.', [ACEITE_T, 'Filtro de aceite'], 69990),
+    E('2020-08-21', 20340, 'mant', 'taller', 'granavenida', 'Mantención de 20.000 km: aceite, filtros de aceite y aire, rotación de neumáticos.', [ACEITE_T, 'Filtro de aceite', 'Filtro de aire'], 104990),
+    PRT('2021-04-15', 27880, 'Ñuñoa'),
+    E('2021-07-09', 30410, 'mant', 'taller', 'soto', 'Mantención de 30.000 km: aceite, filtros, líquido de frenos y revisión de suspensión.', [ACEITE_T, 'Filtro de aceite', 'Filtro de polen', 'Líquido de frenos DOT 4'], 139990),
+    PRT('2022-04-11', 39050, 'Ñuñoa'),
+    E('2022-05-27', 40230, 'mant', 'taller', 'soto', 'Mantención de 40.000 km: aceite, filtros de aceite, aire y polen, y bujías.', [ACEITE_T, 'Filtro de aceite', 'Filtro de aire', 'Filtro de polen', 'Bujías de iridio (4)'], 179990),
+    DUENO('2022-11-19', 45300, 'rep', 'Vulcanización', 'Cambio de los 4 neumáticos.'),
+    E('2023-03-18', 48770, 'rep', 'taller', 'soto', 'Cambio de pastillas y rectificado de discos delanteros.', ['Pastillas de freno delanteras', 'Rectificado de discos (2)'], 124990),
+    PRT('2023-04-12', 49320, 'Ñuñoa'),
+    E('2023-06-02', 50410, 'mant', 'taller', 'soto', 'Mantención de 50.000 km: aceite, filtros y revisión general.', [ACEITE_T, 'Filtro de aceite', 'Filtro de aire'], 99990),
+    PRT('2024-04-08', 59180, 'Ñuñoa'),
+    E('2024-05-16', 60240, 'mant', 'taller', 'soto', 'Mantención de 60.000 km: aceite, filtros, refrigerante y correa de accesorios.', [ACEITE_T, 'Filtro de aceite', 'Refrigerante (4 L)', 'Correa de accesorios'], 214990),
+    E('2025-03-22', 68610, 'rep', 'taller', 'vicuna', 'Batería sin carga: reemplazo y prueba del sistema de carga.', ['Batería 45 Ah'], 109990),
+    PRT('2025-04-10', 69020, 'Ñuñoa'),
+    E('2025-06-14', 70350, 'mant', 'taller', 'soto', 'Mantención de 70.000 km: aceite, filtros de aceite y aire, revisión de frenos.', [ACEITE_T, 'Filtro de aceite', 'Filtro de aire'], 119990),
+    PRT('2026-04-09', 78400, 'Ñuñoa'),
+    E('2026-06-20', 80150, 'mant', 'taller', 'soto', 'Mantención de 80.000 km: aceite, filtros, bujías y líquido de frenos.', [ACEITE_T, 'Filtro de aceite', 'Filtro de aire', 'Bujías de iridio (4)', 'Líquido de frenos DOT 4'], 229990)
+  ],
+  JXTR61: [
+    E('2019-05-20', 11400, 'mant', 'taller', 'andes', 'Mantención de 10.000 km: cambio de aceite y filtro.', [ACEITE, 'Filtro de aceite'], 74990),
+    E('2020-05-08', 21900, 'mant', 'taller', 'andes', 'Mantención de 20.000 km: aceite, filtros de aceite y aire.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 99990),
+    PRT('2020-06-15', 22300, 'Providencia'),
+    E('2021-04-02', 32700, 'mant', 'taller', 'andes', 'Mantención de 30.000 km: aceite, filtros y líquido de frenos.', [ACEITE, 'Filtro de aceite', 'Filtro de polen', 'Líquido de frenos DOT 4'], 129990),
+    PRT('2021-06-14', 34100, 'Providencia'),
+    E('2022-03-11', 43800, 'mant', 'taller', 'andes', 'Mantención de 40.000 km: aceite, filtros y bujías.', [ACEITE, 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)'], 169990),
+    PRT('2022-06-09', 45900, 'Providencia'),
+    E('2022-08-23', 47350, 'sin', 'taller', 'pajaritos', 'Choque frontal con daño estructural. Se reemplazaron el larguero delantero derecho y el travesaño del radiador. Los airbags no se activaron.', ['Larguero delantero derecho', 'Travesaño frontal', 'Radiador', 'Parachoques delantero', 'Foco delantero derecho'], 2840000, { resumen: 'Choque frontal con daño estructural: se reemplazaron el larguero delantero derecho y el travesaño del radiador' }),
+    E('2022-11-30', 49200, 'rep', 'taller', 'pajaritos', 'Control posterior a la reparación: alineación y medición de chasis dentro de tolerancia.', ['Alineación y balanceo', 'Medición de chasis'], 89990),
+    E('2023-03-15', 53600, 'mant', 'taller', 'andes', 'Mantención de 50.000 km: aceite, filtros y revisión general.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 109990),
+    PRT('2023-06-07', 55400, 'Providencia'),
+    E('2024-03-20', 64900, 'mant', 'taller', 'andes', 'Mantención de 60.000 km: aceite, filtros, refrigerante y correa de distribución.', [ACEITE, 'Filtro de aceite', 'Refrigerante (4 L)', 'Kit de distribución'], 389990),
+    PRT('2024-06-12', 67000, 'Providencia'),
+    DUENO('2025-04-18', 76800, 'mant', 'Servicio en concesionario', 'Mantención de 70.000 km.'),
+    PRT('2025-06-10', 78300, 'Providencia'),
+    DUENO('2026-05-29', 88100, 'mant', 'Lubricentro', 'Cambio de aceite y filtro.'),
+    PRT('2026-06-11', 88900, 'Providencia')
+  ],
+  HBLS27: [
+    DUENO('2016-11-10', 9800, 'mant', 'Servicio en concesionario', 'Primera mantención de 10.000 km.'),
+    DUENO('2017-09-15', 21300, 'mant', 'Lubricentro', 'Cambio de aceite y filtros.'),
+    PRT('2018-03-20', 27900, 'San Miguel'),
+    E('2018-08-30', 33200, 'mant', 'taller', 'granavenida', 'Mantención de 30.000 km: aceite, filtros y bujías.', ['Aceite 10W-40 (4 L)', 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)'], 119990),
+    PRT('2019-03-14', 40100, 'San Miguel'),
+    DUENO('2019-10-03', 46700, 'rep', 'Taller particular', 'Cambio de kit de embrague.'),
+    PRT('2020-03-12', 50800, 'San Miguel'),
+    PRT('2022-05-19', 89400, 'San Miguel', 'Revisión técnica aprobada con observaciones: neumáticos traseros con desgaste.'),
+    E('2022-06-28', 91200, 'mant', 'taller', 'soto', 'Mantención atrasada: aceite, filtros, correa de distribución y bomba de agua.', ['Aceite 10W-40 (4 L)', 'Filtro de aceite', 'Filtro de aire', 'Kit de distribución', 'Bomba de agua'], 349990),
+    PRT('2023-05-17', 99800, 'San Miguel'),
+    E('2023-12-04', 104600, 'mant', 'taller', 'soto', 'Mantención de 100.000 km: aceite, filtros y revisión de frenos.', ['Aceite 10W-40 (4 L)', 'Filtro de aceite', 'Filtro de aire'], 129990),
+    PRT('2024-05-22', 109300, 'San Miguel'),
+    E('2025-01-27', 115900, 'rep', 'taller', 'soto', 'Cambio de amortiguadores delanteros.', ['Amortiguadores delanteros (2)', 'Cazoletas (2)'], 259990),
+    PRT('2025-05-20', 118700, 'San Miguel'),
+    PRT('2026-05-14', 128100, 'San Miguel')
+  ],
+  JKWD84: [
+    E('2018-01-16', 12400, 'mant', 'taller', 'granavenida', 'Mantención de 10.000 km: cambio de aceite y filtro.', [ACEITE, 'Filtro de aceite'], 72990),
+    DUENO('2018-11-20', 26100, 'mant', 'Lubricentro', 'Cambio de aceite.'),
+    PRT('2019-04-10', 33900, 'La Florida'),
+    E('2019-12-05', 47300, 'mant', 'taller', 'granavenida', 'Mantención de 40.000 km: aceite, filtros y bujías.', [ACEITE, 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)'], 159990),
+    E('2021-03-22', 67200, 'rep', 'taller', 'andes', 'Falla en caja CVT: cambio de aceite CVT y reemplazo de solenoide.', ['Aceite CVT (8 L)', 'Solenoide de caja CVT'], 689990),
+    PRT('2021-06-30', 70500, 'La Florida'),
+    PRT('2022-06-15', 84700, 'La Florida'),
+    PRT('2023-05-23', 98450, 'La Florida'),
+    DUENO('2024-02-08', 71900, 'mant', 'Taller particular', 'Cambio de aceite y filtros.'),
+    PRT('2024-05-30', 76300, 'La Florida'),
+    E('2025-03-12', 85100, 'mant', 'taller', 'soto', 'Mantención según odómetro: aceite, filtros y revisión de frenos.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 139990),
+    PRT('2025-05-28', 87900, 'La Florida'),
+    PRT('2026-05-26', 99600, 'La Florida')
+  ],
+  LFGH19: [],
+  PRBX55: [
+    E('2022-05-10', 9700, 'mant', 'taller', 'granavenida', 'Mantención de 10.000 km: cambio de aceite y filtro.', [ACEITE, 'Filtro de aceite'], 64990),
+    E('2023-03-28', 19900, 'mant', 'taller', 'granavenida', 'Mantención de 20.000 km: aceite, filtros de aceite y aire.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 94990),
+    PRT('2023-07-18', 22600, 'San Miguel'),
+    DUENO('2024-02-14', 30300, 'mant', 'Servicio en concesionario', 'Mantención de 30.000 km.'),
+    PRT('2024-07-16', 34800, 'San Miguel'),
+    DUENO('2024-12-03', 39900, 'rep', 'Vulcanización', 'Cambio de los 2 neumáticos delanteros.'),
+    E('2025-01-20', 40600, 'mant', 'taller', 'granavenida', 'Mantención de 40.000 km: aceite, filtros, bujías y líquido de frenos.', [ACEITE, 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)', 'Líquido de frenos DOT 4'], 164990),
+    PRT('2025-07-15', 46900, 'San Miguel'),
+    E('2026-01-26', 51200, 'mant', 'taller', 'soto', 'Mantención de 50.000 km: aceite, filtros y revisión de suspensión.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 109990),
+    PRT('2026-07-14', 56000, 'San Miguel')
+  ],
+  RSKT09: [
+    E('2023-06-22', 10300, 'mant', 'taller', 'granavenida', 'Mantención de 10.000 km: cambio de aceite y filtro.', [ACEITE, 'Filtro de aceite'], 59990),
+    DUENO('2024-06-14', 20600, 'mant', 'Servicio en concesionario', 'Mantención de 20.000 km.'),
+    PRT('2024-09-10', 23100, 'San Miguel'),
+    DUENO('2025-07-02', 31900, 'mant', 'Servicio en concesionario', 'Mantención de 30.000 km.'),
+    PRT('2025-09-09', 33800, 'San Miguel')
+  ],
+  KFPZ66: [],
+  LCXR58: [
+    E('2020-12-14', 9900, 'mant', 'taller', 'granavenida', 'Mantención de 10.000 km: cambio de aceite y filtro.', [ACEITE, 'Filtro de aceite'], 62990),
+    DUENO('2021-10-25', 20100, 'mant', 'Servicio en concesionario', 'Mantención de 20.000 km.'),
+    PRT('2022-02-15', 23800, 'San Miguel'),
+    E('2022-08-30', 30400, 'mant', 'taller', 'granavenida', 'Mantención de 30.000 km: aceite, filtros y líquido de frenos.', [ACEITE, 'Filtro de aceite', 'Filtro de polen', 'Líquido de frenos DOT 4'], 124990),
+    PRT('2023-02-14', 35600, 'San Miguel'),
+    E('2023-06-20', 40200, 'mant', 'taller', 'andes', 'Mantención de 40.000 km: aceite, filtros y bujías.', [ACEITE, 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)'], 164990),
+    PRT('2024-02-13', 47900, 'Providencia'),
+    E('2024-05-07', 50300, 'mant', 'taller', 'andes', 'Mantención de 50.000 km: aceite, filtros y revisión general.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 104990),
+    PRT('2025-02-11', 58100, 'Providencia'),
+    E('2025-04-29', 60400, 'mant', 'taller', 'andes', 'Mantención de 60.000 km: aceite, filtros y refrigerante.', [ACEITE, 'Filtro de aceite', 'Filtro de polen', 'Refrigerante (4 L)'], 154990),
+    PRT('2026-02-10', 68200, 'Providencia'),
+    E('2026-03-26', 70100, 'mant', 'taller', 'andes', 'Mantención de 70.000 km: aceite, filtros y revisión de frenos.', [ACEITE, 'Filtro de aceite', 'Filtro de aire'], 114990)
+  ],
+  KDSV12: [
+    DUENO('2019-02-19', 10900, 'mant', 'Servicio en concesionario', 'Mantención de 10.000 km.'),
+    DUENO('2020-01-28', 22400, 'mant', 'Servicio en concesionario', 'Mantención de 20.000 km.'),
+    PRT('2020-03-24', 23500, 'La Florida'),
+    PRT('2021-03-16', 33800, 'La Florida'),
+    E('2021-08-12', 38200, 'mant', 'taller', 'vicuna', 'Mantención de 40.000 km y escaneo computarizado sin códigos de falla.', [ACEITE, 'Filtro de aceite', 'Filtro de aire', 'Bujías (4)'], 149990),
+    PRT('2022-04-20', 45100, 'La Florida'),
+    E('2022-10-11', 51700, 'rep', 'taller', 'vicuna', 'Falla de carga: reemplazo de alternador.', ['Alternador reacondicionado'], 279990),
+    PRT('2023-04-18', 56900, 'La Florida'),
+    PRT('2024-04-16', 66300, 'La Florida'),
+    PRT('2025-04-15', 76000, 'La Florida'),
+    PRT('2026-04-14', 85900, 'La Florida')
+  ],
+  HJBD20: []
+};
+Object.keys(BASE).forEach(p => BASE[p].forEach((e, i) => { e.id = p + '-' + i; }));
+
+const TIPOS = {
+  mant: { label: 'Mantención', icon: 'wrench' },
+  rep:  { label: 'Reparación', icon: 'gear' },
+  sin:  { label: 'Siniestro', icon: 'alert' },
+  prt:  { label: 'Revisión técnica', icon: 'clipboard' }
+};
+const SELLOS = {
+  taller: { label: 'Verificado por taller', corto: 'Taller', cls: 'ok', icon: 'shield' },
+  prt:    { label: 'Revisión técnica / PRT', corto: 'PRT', cls: 'prt', icon: 'gauge' },
+  dueno:  { label: 'Declarado por el dueño', corto: 'Dueño', cls: 'own', icon: 'user' }
+};
+const PESO = { taller: 1, prt: 0.7, dueno: 0.1 };
+
+const UF_REF = 40870; // valor referencial de la UF para mostrar el equivalente en pesos
+const PRECIO_INFORME = 9990; // informe suelto, sin suscripción
+const PLANES = [
+  { id: 'esencial', nombre: 'Esencial', uf: 4, consultas: 30, insights: false, items: ['30 consultas de historial al mes', 'Certificados con QR ilimitados'] },
+  { id: 'pro', nombre: 'Pro', uf: 8, consultas: Infinity, insights: true, items: ['Consultas ilimitadas', 'Certificados con QR ilimitados', 'Bitácora Insights: días en stock, precio sugerido y alertas de sobrestock'] }
+];
+const DIAS_SOBRESTOCK = 45;
+const LEADS_BASE = [
+  { fecha: '2026-11-08', tipo: 'Revisión precompra', veh: 'Chevrolet Sail 2016', patente: 'HBLS27', origen: 'Un comprador vio el período sin registros y pidió una revisión.' },
+  { fecha: '2026-11-04', tipo: 'Mantención de 90.000 km', veh: 'Kia Rio 5 2018', patente: 'KDSV12', origen: 'La nueva dueña encontró tu taller en el historial del auto.' }
+];
+
+/* ================= Estado (memoria + localStorage opcional) ================= */
+const KEY = 'bitacora-demo-v2';
+const estadoInicial = () => ({ extra: {}, extraVeh: {}, unlocked: {}, usage: 23, evaluated: {}, certified: { PRBX55: '2026-10-28' }, plan: 'pro', leads: [], registrosMes: 14, solicitados: {} });
+let S = estadoInicial();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(estadoInicial(), JSON.parse(raw)); } catch (e) { /* sin almacenamiento: se usa memoria */ }
+function guardar() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignorar */ } }
+
+const getVeh = p => VEH[p] || S.extraVeh[p] || null;
+function eventosDe(p) {
+  return (BASE[p] || []).concat(S.extra[p] || []).slice().sort((a, b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : (a.creado || 0) - (b.creado || 0)));
+}
+const planActual = () => PLANES.find(x => x.id === S.plan) || PLANES[1];
+const fechaIns = v => (v.insAprox ? 'año ' + v.anio : fecha(v.inscripcion));
+
+/* ================= Índice de trazabilidad ================= */
+function analizar(v) {
+  const evs = eventosDe(v.patente);
+  const a = { evs: evs, gaps: [], incons: [], siniestros: [], score: 0, cov: 0, ver: 0, mant: 0, mantCount: 0, mantEsperadas: 0, desc: 0, last: null, maxKm: 0, nTaller: 0, nPrt: 0, nDueno: 0 };
+  if (!evs.length) return a;
+  let prev = { fecha: v.inscripcion, km: 0, inscripcion: true };
+  evs.forEach(e => {
+    const m = meses(prev.fecha, e.fecha), dk = e.km - prev.km;
+    if (dk < 0) a.incons.push({ ev: e, prev: prev });
+    if (m > 12 || dk > 15000) a.gaps.push({ desde: prev, hasta: e, meses: Math.max(m, 0), km: dk > 0 ? dk : null });
+    if (e.tipo === 'sin') a.siniestros.push(e);
+    if (e.sello === 'taller') a.nTaller++; else if (e.sello === 'prt') a.nPrt++; else a.nDueno++;
+    if (e.tipo === 'mant') a.mantCount++;
+    a.maxKm = Math.max(a.maxKm, e.km);
+    prev = e;
+  });
+  a.last = evs[evs.length - 1];
+  const cola = meses(a.last.fecha, HOY);
+  if (cola > 12) a.gaps.push({ desde: a.last, hasta: null, meses: cola, km: null });
+  const total = Math.max(1, meses(v.inscripcion, HOY));
+  const enVacio = a.gaps.reduce((s, g) => s + g.meses, 0);
+  a.cov = clamp(1 - enVacio / total, 0, 1);
+  a.ver = evs.reduce((s, e) => s + PESO[e.sello], 0) / evs.length;
+  a.mantEsperadas = Math.max(1, Math.round(Math.max(a.maxKm / 10000, total / 12)));
+  a.mant = clamp(a.mantCount / a.mantEsperadas, 0, 1);
+  a.desc = a.gaps.length * 10 + a.incons.length * 25;
+  a.score = clamp(Math.round(40 * a.cov + 35 * a.ver + 25 * a.mant - a.desc), 0, 100);
+  return a;
+}
+function banda(a) {
+  if (!a.evs.length) return { t: 'Sin registros', cls: 'own' };
+  if (a.score >= 80) return { t: 'Alta', cls: 'ok' };
+  if (a.score >= 50) return { t: 'Media', cls: 'gap' };
+  return { t: 'Baja', cls: 'gap' };
+}
+
+/* ================= Piezas de interfaz ================= */
+const plateHTML = (p, size) => '<span class="plate' + (size ? ' plate--' + size : '') + '" aria-label="Patente ' + fmtP(p) + '"><small>CHILE</small><b>' + fmtP(p) + '</b></span>';
+const logoMark = '<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect class="lm-bg" width="32" height="32" rx="9"/><path class="lm-rail" d="M11 9v14"/><circle class="lm-d1" cx="11" cy="9" r="3.3"/><circle class="lm-d2" cx="11" cy="16" r="3.3"/><circle class="lm-d3" cx="11" cy="23" r="3.3"/><path class="lm-ln" d="M17.5 9h7M17.5 16h5M17.5 23h6"/></svg>';
+const selloHTML = k => { const s = SELLOS[k]; return '<span class="sello sello--' + s.cls + '">' + ic(s.icon) + s.label + '</span>'; };
+
+function gapTexto(g, v) {
+  const desde = g.desde.inscripcion ? 'la primera inscripción (' + fechaIns(v) + ')' : fecha(g.desde.fecha);
+  return 'Sin registros entre ' + desde + ' y ' + (g.hasta ? fecha(g.hasta.fecha) : 'hoy');
+}
+const gapDetalle = g => mesesTxt(g.meses) + (g.km ? ' · ' + kms(g.km) : '') + ' sin respaldo';
+
+function alertasHTML(v, a) {
+  let h = '';
+  a.siniestros.forEach(s => {
+    h += '<div class="alert alert--risk" role="alert"><span class="alert-ic">' + ic('alert') + '</span><div>' +
+      '<p class="alert-t">Siniestro registrado el ' + fecha(s.fecha) + '</p>' +
+      '<p>' + esc(s.resumen || s.desc) + '.</p>' +
+      '<p class="alert-s">Antes de comprar, pide el detalle de la reparación y una revisión de la estructura.</p></div></div>';
+  });
+  a.incons.forEach(x => {
+    h += '<div class="alert alert--risk" role="alert"><span class="alert-ic">' + ic('gauge') + '</span><div>' +
+      '<p class="alert-t">Kilometraje inconsistente</p>' +
+      '<p>El ' + fecha(x.ev.fecha) + ' se registraron ' + kms(x.ev.km) + ', menos que los ' + kms(x.prev.km) + ' registrados el ' + fecha(x.prev.fecha) + '.</p>' +
+      '<p class="alert-s">Puede ser un error de registro o una adulteración del odómetro.</p></div></div>';
+  });
+  if (a.gaps.length) {
+    h += '<div class="alert alert--gap"><span class="alert-ic">' + ic('calx') + '</span><div>' +
+      '<p class="alert-t">' + (a.gaps.length === 1 ? 'Hay 1 período sin registros' : 'Hay ' + a.gaps.length + ' períodos sin registros') + '</p>' +
+      '<ul class="alert-list">' + a.gaps.map(g => '<li>' + gapTexto(g, v) + ' <span class="muted">(' + gapDetalle(g) + ')</span></li>').join('') + '</ul>' +
+      '<p class="alert-s">No se sabe qué le pasó al auto en ese tiempo. Un historial con vacíos no es un historial limpio.</p></div></div>';
+  }
+  if (a.evs.length && !a.siniestros.length && !a.incons.length && !a.gaps.length) {
+    h += '<div class="alert alert--ok"><span class="alert-ic">' + ic('shield') + '</span><div>' +
+      '<p class="alert-t">Sin alertas en el historial</p>' +
+      '<p>No hay siniestros registrados en Bitácora, el kilometraje es consistente y no hay períodos sin registros.</p></div></div>';
+  }
+  return h ? '<div class="alertas">' + h + '</div>' : '';
+}
+
+function indiceHTML(a, compact) {
+  const b = banda(a);
+  return '<section class="indice" aria-label="Índice de trazabilidad">' +
+    '<div class="ring ring--' + b.cls + '" style="--p:' + a.score + '"><span><b>' + a.score + '</b><small>/100</small></span></div>' +
+    '<div class="indice-txt"><p class="indice-label">Índice de trazabilidad · <strong class="tx-' + b.cls + '">' + b.t + '</strong></p>' +
+    '<p class="indice-help">Mide qué tan completo y verificado está el historial, no el estado mecánico del auto.</p>' +
+    (compact || !a.evs.length ? '' : calcHTML(a)) + '</div></section>';
+}
+function calcHTML(a) {
+  const row = (lbl, pct, hint) => '<div><div class="calc-top"><span>' + lbl + '</span><b>' + Math.round(pct * 100) + ' %</b></div><div class="bar"><i style="width:' + Math.round(pct * 100) + '%"></i></div><small>' + hint + '</small></div>';
+  const partes = [];
+  if (a.gaps.length) partes.push(a.gaps.length + (a.gaps.length === 1 ? ' período' : ' períodos') + ' sin registros');
+  if (a.incons.length) partes.push(a.incons.length + ' inconsistencia de kilometraje');
+  return '<details class="calc"><summary>¿Cómo se calcula?</summary><div class="calc-body">' +
+    row('Cobertura · 40 %', a.cov, 'Parte de la vida del auto, desde su primera inscripción, sin vacíos de más de 12 meses o 15.000 km.') +
+    row('Verificación · 35 %', a.ver, 'Respaldo de cada registro: taller adherido con boleta 100 %, revisión técnica 70 %, declarado por el dueño 10 %.') +
+    row('Mantenciones · 25 %', a.mant, a.mantCount + ' de ' + a.mantEsperadas + ' esperadas (una cada 10.000 km o cada 12 meses).') +
+    (a.desc ? '<p class="calc-desc">Descuentos: −' + a.desc + ' puntos por ' + partes.join(' y ') + '.</p>' : '') +
+    '</div></details>';
+}
+function resumenHTML(a) {
+  return '<dl class="resumen">' +
+    '<div><dt>Último km registrado</dt><dd>' + kms(a.last.km) + '<small>' + fecha(a.last.fecha) + '</small></dd></div>' +
+    '<div><dt>Registros</dt><dd>' + a.evs.length + '<small>desde ' + a.evs[0].fecha.slice(0, 4) + '</small></dd></div>' +
+    '<div><dt>Verificados por taller</dt><dd>' + a.nTaller + '<small>+ ' + revs(a.nPrt) + '</small></dd></div>' +
+    '<div><dt>Períodos sin registro</dt><dd class="' + (a.gaps.length ? 'tx-gap' : '') + '">' + (a.gaps.length || 'Ninguno') + '<small>' + (a.siniestros.length ? a.siniestros.length + ' siniestro registrado' : 'Sin siniestros registrados') + '</small></dd></div>' +
+    '</dl>';
+}
+
+function evItem(e, a, unlocked) {
+  const t = TIPOS[e.tipo], s = SELLOS[e.sello];
+  const inc = a.incons.find(x => x.ev === e);
+  const tl = TALLERES[e.taller];
+  const lugar = tl ? tl.nombre + ' · ' + tl.comuna : e.taller;
+  const det = unlocked
+    ? '<p class="ev-desc">' + esc(e.desc) + '</p>' +
+      (e.nota ? '<p class="ev-nota">' + ic('mic') + '<span>' + esc(e.nota) + '</span></p>' : '') +
+      (e.rep && e.rep.length ? '<p class="ev-rep"><span>Repuestos:</span> ' + e.rep.map(esc).join(' · ') + '</p>' : '') +
+      '<p class="ev-meta">' + ic('pin') + '<span>' + esc(lugar) + '</span>' + (e.monto != null ? '<b class="ev-monto">' + clp(e.monto) + '</b>' : '') + '</p>'
+    : '<div class="sk-group" aria-hidden="true"><span class="sk" style="width:86%"></span><span class="sk" style="width:58%"></span></div>' +
+      '<p class="sk-lock">' + ic('lock') + ' Trabajo, taller, repuestos y monto en el historial completo</p>';
+  return '<li class="ev ev--' + e.tipo + ' sello-' + s.cls + (e.nuevo ? ' ev--nuevo' : '') + '" data-ev="' + esc(e.id) + '">' +
+    '<span class="ev-dot" aria-hidden="true"></span><article class="ev-card">' +
+    '<header class="ev-top"><time datetime="' + e.fecha + '">' + fecha(e.fecha) + '</time>' +
+    (unlocked ? '<span class="ev-km">' + kms(e.km) + '</span>' : '<span class="ev-km is-lock">' + ic('lock') + 'km</span>') + '</header>' +
+    '<div class="ev-tags"><span class="tipo tipo--' + e.tipo + '">' + ic(t.icon) + t.label + '</span>' + selloHTML(e.sello) + (e.nuevo ? '<span class="nuevo">Nuevo</span>' : '') + '</div>' +
+    det +
+    (inc ? '<p class="ev-flag">' + ic('alert') + '<span>Kilometraje menor al registro anterior (' + kms(inc.prev.km) + ' el ' + fecha(inc.prev.fecha) + ')</span></p>' : '') +
+    '</article></li>';
+}
+const gapItem = (g, v) => '<li class="tl-gap"><div class="gap-card">' + ic('calx') + '<div><p class="gap-t">' + gapTexto(g, v) + '</p><p class="gap-s">' + gapDetalle(g) + '</p></div></div></li>';
+
+function timelineHTML(v, a, unlocked) {
+  const porHasta = new Map(); let cola = null;
+  a.gaps.forEach(g => { if (g.hasta) porHasta.set(g.hasta, g); else cola = g; });
+  const items = [];
+  if (cola) items.push(gapItem(cola, v));
+  for (let i = a.evs.length - 1; i >= 0; i--) {
+    const e = a.evs[i];
+    items.push(evItem(e, a, unlocked));
+    if (porHasta.has(e)) items.push(gapItem(porHasta.get(e), v));
+  }
+  items.push('<li class="tl-ins"><span class="ins-dot" aria-hidden="true"></span><p><b>Primera inscripción</b> · ' + fechaIns(v) + '</p></li>');
+  return '<ol class="tl" aria-label="Historial del vehículo">' + items.join('') + '</ol>';
+}
+function vacioHTML(v) {
+  return '<div class="vacio">' + ic('car', 'ic-big') +
+    '<h3>Este vehículo aún no tiene registros en Bitácora</h3>' +
+    '<p>Ningún taller adherido ha registrado servicios de este auto. Que no haya registros no significa que tenga problemas, pero no hay nada que respalde su historial.</p>' +
+    '<p>Pídele al vendedor las boletas de mantención o llévalo a una revisión precompra en un taller Bitácora.</p></div>';
+}
+function leyendaHTML() {
+  return '<div class="leyenda"><p class="leyenda-t">Qué significa cada sello</p><ul>' +
+    '<li>' + selloHTML('taller') + '<span>Lo subió un taller adherido, con foto de la boleta u orden de trabajo.</span></li>' +
+    '<li>' + selloHTML('prt') + '<span>Kilometraje oficial de la planta de revisión técnica.</span></li>' +
+    '<li>' + selloHTML('dueno') + '<span>Informado por el dueño, sin respaldo.</span></li>' +
+    '<li><span class="sello sello--gap">' + ic('calx') + 'Sin registros</span><span>Más de 12 meses o 15.000 km sin información.</span></li>' +
+    '</ul></div>';
+}
+
+function fichaHTML(v, opts) {
+  const a = analizar(v), unlocked = !!opts.unlocked, comprador = opts.ctx === 'comprador';
+  const hay = a.evs.length > 0;
+  let h = '<article class="ficha" data-p="' + v.patente + '">' +
+    '<header class="ficha-head">' + plateHTML(v.patente) +
+    '<div class="ficha-veh"><h2>' + esc(nombreVeh(v)) + ' <span class="anio">' + v.anio + '</span></h2><p>' + esc(v.color) + ' · Primera inscripción ' + fechaIns(v) + '</p></div></header>' +
+    (comprador && opts.cert ? '<div class="cert-note">' + ic('doc') + '<div><b>Certificado por Automotora Cordillera: historial completo gratis</b>' +
+      '<span>Código de verificación ' + codigoCert(v.patente) + ' · emitido el ' + fecha(S.certified[v.patente]) + '</span></div></div>' : '') +
+    alertasHTML(v, a) +
+    '<div class="ficha-grid">' + indiceHTML(a) + (hay ? resumenHTML(a) : '') + '</div>';
+  if (comprador && hay && !unlocked) {
+    h += '<div class="pay-card"><p><b>Estás viendo la ficha resumida (gratis).</b>El historial completo muestra kilometraje, taller, trabajo, repuestos y monto ' + losRegs(a.evs.length) + '.</p>' +
+      '<button type="button" class="btn btn-primary btn-lg" data-action="pago" data-p="' + v.patente + '">' + ic('lock') + 'Ver historial completo – $9.990</button></div>';
+  }
+  if (comprador) h += '<div class="ficha-cta"><button type="button" class="btn btn-ghost" data-action="talleres" data-p="' + v.patente + '">' + ic('pin') + 'Ver talleres Bitácora cerca</button></div>';
+  h += '<section class="hist"><div class="hist-head"><h3>' + (hay ? (unlocked ? 'Historial completo' : 'Historial resumido') : 'Historial') + '</h3>' +
+    (hay ? '<span>' + regs(a.evs.length) + (a.evs.length > 1 ? ' · del más reciente al más antiguo' : '') + '</span>' : '') + '</div>' +
+    (hay ? timelineHTML(v, a, unlocked) : vacioHTML(v));
+  if (comprador && hay && !unlocked) {
+    h += '<div class="hist-lock"><span class="muted">' + ic('lock') + ' Detalle bloqueado en ' + regs(a.evs.length) + '</span><button type="button" class="btn btn-primary" data-action="pago" data-p="' + v.patente + '">Ver historial completo – $9.990</button></div>';
+  }
+  h += '</section>' + (hay ? leyendaHTML() : '');
+  if (comprador && hay && !unlocked) {
+    h += '<div class="paybar"><div><b>Historial completo</b><small>' + regs(a.evs.length) + ' con km, taller y montos</small></div><button type="button" class="btn btn-primary" data-action="pago" data-p="' + v.patente + '">Ver – $9.990</button></div>';
+  }
+  return h + '</article>';
+}
+
+/* ================= Modal y aviso ================= */
+let lastFocus = null;
+function openModal(title, body, wide) {
+  const root = $('#modal-root');
+  lastFocus = document.activeElement;
+  root.innerHTML = '<div class="modal-backdrop" data-close></div>' +
+    '<div class="modal' + (wide ? ' modal--wide' : '') + '" role="dialog" aria-modal="true" aria-labelledby="modal-title">' +
+    '<header class="modal-head"><h2 id="modal-title">' + title + '</h2><button type="button" class="icon-btn" data-close aria-label="Cerrar">' + ic('x') + '</button></header>' +
+    '<div class="modal-body" id="modal-body">' + body + '</div></div>';
+  root.hidden = false;
+  document.body.classList.add('no-scroll');
+  const btn = $('.modal-head .icon-btn', root); if (btn) btn.focus({ preventScroll: true });
+}
+function closeModal() {
+  const root = $('#modal-root');
+  if (root.hidden) return;
+  root.hidden = true; root.innerHTML = '';
+  document.body.classList.remove('no-scroll');
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+}
+let toastT = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false;
+  requestAnimationFrame(() => t.classList.add('is-on'));
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.classList.remove('is-on'); setTimeout(() => { t.hidden = true; }, 250); }, 2800);
+}
+
+/* ================= Vista: inicio ================= */
+function miniEv(e) {
+  if (!e) return '';
+  const s = SELLOS[e.sello], t = TIPOS[e.tipo];
+  return '<li class="ev ev--' + e.tipo + ' sello-' + s.cls + '"><span class="ev-dot" aria-hidden="true"></span><div class="ev-card">' +
+    '<div class="ev-top"><time datetime="' + e.fecha + '">' + fecha(e.fecha) + '</time><span class="ev-km">' + kms(e.km) + '</span></div>' +
+    '<div class="ev-tags"><span class="tipo">' + ic(t.icon) + t.label + '</span>' + selloHTML(e.sello) + '</div></div></li>';
+}
+function rolCard(rol, icon, para, ben, cta) {
+  return '<article class="rol"><div class="rol-top"><span class="rol-ic">' + ic(icon) + '</span><p class="rol-para">' + para + '</p></div>' +
+    '<p class="rol-ben">' + ben + '</p>' +
+    '<button type="button" class="btn btn-primary btn-lg btn-block" data-go="' + rol + '"><span>' + cta + '</span>' + ic('arrow') + '</button></article>';
+}
+function viewInicio() {
+  const p = 'HBLS27', v = getVeh(p), a = analizar(v);
+  const pick = f => a.evs.find(e => e.fecha === f);
+  const gap = a.gaps.find(g => g.hasta && g.hasta.fecha === '2022-05-19');
+  const b = banda(a);
+  return '<section class="hero">' +
+    '<div class="hero-txt"><p class="eyebrow">Historial técnico portable</p>' +
+    '<h1>El historial que tu auto nunca tuvo</h1>' +
+    '<p class="lead">Mantenciones, reparaciones, siniestros y kilometraje en un solo expediente asociado a la patente, no al taller ni al dueño. Cuando el auto cambia de manos, su historial se va con él.</p>' +
+    '<div class="hero-points"><span>' + ic('shield') + 'Sellos de verificación</span><span>' + ic('calx') + 'Vacíos a la vista</span><span>' + ic('alert') + 'Siniestros destacados</span></div></div>' +
+    '<div class="roles"><h2 class="roles-title">¿Cómo quieres probar Bitácora?</h2><div class="roles-grid">' +
+    rolCard('automotora', 'store', 'Para automotoras', 'Evalúa retomas en segundos y vende con un certificado que respalda tu precio.', 'Soy automotora') +
+    rolCard('taller', 'wrench', 'Para talleres', 'Registra un servicio con una foto en menos de un minuto y recibe clientes derivados.', 'Soy taller') +
+    rolCard('comprador', 'cart', 'Para quien compra', 'Antes de pagar, revisa mantenciones, siniestros y los períodos sin registro del auto.', 'Quiero comprar un auto') +
+    '</div></div>' +
+    '<aside class="hero-demo" aria-label="Ejemplo de ficha"><div class="demo-card">' +
+    '<div class="demo-card-head">' + plateHTML(p, 'sm') + '<div class="dc-veh"><b>' + nombreVeh(v) + ' ' + v.anio + '</b><span>Índice de trazabilidad · ' + b.t + '</span></div>' +
+    '<div class="ring ring--sm ring--' + b.cls + '" style="--p:' + a.score + '"><span><b>' + a.score + '</b></span></div></div>' +
+    '<ol class="tl">' + miniEv(pick('2022-06-28')) + miniEv(pick('2022-05-19')) + (gap ? gapItem(gap, v) : '') + miniEv(pick('2020-03-12')) + miniEv(pick('2019-10-03')) + '</ol>' +
+    '<div class="demo-foot"><span>Extracto de una ficha de ejemplo</span><button type="button" class="link-btn" data-action="ver-como" data-rol="comprador" data-p="' + p + '">Abrir esta ficha</button></div>' +
+    '</div></aside></section>';
+}
+
+/* ================= Vista: comprador ================= */
+let cPatente = '';
+function plateInput(id, val) {
+  return '<div class="plate-input"><small>CHILE</small><input id="' + id + '" name="' + id + '" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="8" placeholder="AB·CD·12" value="' + esc(val ? fmtP(val) : '') + '" aria-label="Patente"></div>';
+}
+function chipsHTML(list, action) {
+  return list.map(p => { const v = getVeh(p); return '<button type="button" class="chip" data-action="' + action + '" data-p="' + p + '"><b>' + fmtP(p) + '</b><span>' + esc(nombreVeh(v)) + '</span></button>'; }).join('');
+}
+function viewComprador() {
+  return '<section class="buscar"><p class="eyebrow">' + ic('search') + 'Quiero comprar un auto</p>' +
+    '<h1>Revisa el historial antes de comprar</h1>' +
+    '<p class="lead">Ingresa la patente del auto que te interesa. La ficha resumida es gratis.</p>' +
+    '<form id="f-buscar" class="buscar-form" novalidate>' + plateInput('c-patente', cPatente) +
+    '<button class="btn btn-primary btn-lg" type="submit">' + ic('search') + 'Buscar</button></form>' +
+    '<div class="ejemplos"><span>Patentes de ejemplo:</span>' + chipsHTML(EJ_COMPRADOR, 'buscar') + '</div></section>' +
+    '<div id="c-res" aria-live="polite"></div>';
+}
+function noEncontradaHTML(p, extra) {
+  return '<div class="card msg"><span class="msg-ic">' + ic('search') + '</span><div class="msg-body">' +
+    '<h2>Aún no tenemos registros de ' + fmtP(p) + '</h2>' +
+    '<p>Puede que ningún taller adherido haya atendido este auto todavía, o que la patente tenga un error de tipeo. Revisa que esté bien escrita.</p>' +
+    '<p class="muted">Si la patente es correcta, pídele al vendedor las boletas de mantención o llévalo a una revisión precompra en un taller Bitácora.</p>' +
+    (extra || '<div class="row"><button type="button" class="btn btn-primary" data-action="talleres" data-p="">' + ic('pin') + 'Ver talleres Bitácora cerca</button><button type="button" class="btn btn-ghost" data-action="limpiar">Buscar otra patente</button></div>') +
+    '</div></div>';
+}
+function formatoMalHTML(raw) {
+  return '<div class="card msg"><span class="msg-ic">' + ic('info') + '</span><div class="msg-body"><h2>Revisa la patente</h2>' +
+    '<p>“' + esc(raw) + '” no tiene el formato de una patente chilena. Debe tener 6 caracteres: 4 letras y 2 números (AB·CD·12) o 2 letras y 4 números (AB·12·34).</p></div></div>';
+}
+function mostrarComprador(raw) {
+  const box = $('#c-res'); if (!box) return;
+  const p = normP(raw);
+  cPatente = validP(p) ? p : '';
+  if (!p) { box.innerHTML = ''; document.body.classList.remove('has-paybar'); return; }
+  if (!validP(p)) box.innerHTML = formatoMalHTML(raw);
+  else {
+    const v = getVeh(p);
+    const cert = !!S.certified[p];
+    box.innerHTML = v ? fichaHTML(v, { unlocked: cert || !!S.unlocked[p], cert: cert, ctx: 'comprador' }) : noEncontradaHTML(p);
+  }
+  document.body.classList.toggle('has-paybar', !!$('.paybar', box));
+}
+
+function abrirPago(p) {
+  const v = getVeh(p), a = analizar(v);
+  openModal('Historial completo', '<div class="pay">' +
+    '<div class="pay-veh">' + plateHTML(p, 'sm') + '<div><b>' + esc(nombreVeh(v)) + ' ' + v.anio + '</b><p class="muted">' + regs(a.evs.length) + ' en Bitácora</p></div></div>' +
+    '<ul class="checks">' +
+    '<li>' + ic('check') + '<span>Fecha, kilometraje y taller ' + losRegs(a.evs.length) + '</span></li>' +
+    '<li>' + ic('check') + '<span>Trabajos realizados, repuestos y montos</span></li>' +
+    '<li>' + ic('check') + '<span>Detalle de siniestros, reparaciones y períodos sin registro</span></li>' +
+    '<li>' + ic('check') + '<span>Actualizaciones de esta patente durante 30 días</span></li></ul>' +
+    '<div class="pay-total"><span>Total, pago único</span><b>$9.990</b></div>' +
+    '<fieldset class="pay-methods"><legend>Medio de pago</legend>' +
+    '<label class="pm" for="pm-tarjeta"><input type="radio" id="pm-tarjeta" name="pm" checked> Tarjeta de débito o crédito</label>' +
+    '<label class="pm" for="pm-transfer"><input type="radio" id="pm-transfer" name="pm"> Transferencia bancaria</label></fieldset>' +
+    '<button type="button" class="btn btn-primary btn-lg btn-block" id="btn-pagar" data-action="pagar" data-p="' + p + '">Pagar $9.990</button>' +
+    '<p class="fine">' + ic('info') + '<span>Pago simulado: este prototipo no pide datos de tarjeta ni cobra nada.</span></p></div>');
+}
+function pagar(p, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin spin--sm"></span> Procesando pago…';
+  setTimeout(() => {
+    S.unlocked[p] = true; guardar();
+    const body = $('#modal-body');
+    if (body) body.innerHTML = '<div class="pay-ok"><span class="exito-ic">' + ic('check') + '</span><h3>Pago aprobado</h3>' +
+      '<p class="muted">Ya puedes ver el historial completo de ' + fmtP(p) + '.</p>' +
+      '<button type="button" class="btn btn-primary btn-lg btn-block" data-action="ver-completo" data-p="' + p + '">Ver historial completo</button></div>';
+    if (vista === 'comprador' && cPatente === p) mostrarComprador(p);
+  }, 1400);
+}
+
+function abrirTalleres(p) {
+  const lista = Object.keys(TALLERES).sort((x, y) => TALLERES[x].dist - TALLERES[y].dist);
+  openModal('Talleres Bitácora cerca', '<p class="modal-lead">Talleres adheridos que registran sus servicios en Bitácora, ordenados por distancia desde Santiago Centro (ubicación simulada).</p>' +
+    '<ul class="talleres" id="lista-talleres">' + lista.map(id => tallerItem(id, p)).join('') + '</ul>');
+}
+function tallerItem(id, p) {
+  const t = TALLERES[id], key = id + ':' + (p || '');
+  return '<li class="taller" data-t="' + id + '"><div class="taller-info"><h3>' + t.nombre + (t.registros > 200 ? '<span class="badge-rec">Recomendado</span>' : '') + '</h3>' +
+    '<p class="taller-loc">' + ic('pin') + t.comuna + ' · a ' + String(t.dist).replace('.', ',') + ' km</p>' +
+    '<p>' + t.esp + '</p><p class="muted">' + miles(t.registros) + ' servicios registrados · Revisión precompra ' + clp(t.precompra) + '</p></div>' +
+    (S.solicitados[key] ? '<p class="taller-ok">' + ic('check') + 'Solicitud enviada (demo)</p>'
+      : '<button type="button" class="btn btn-ghost btn-sm" data-action="precompra" data-t="' + id + '" data-p="' + (p || '') + '">Pedir revisión precompra</button>') + '</li>';
+}
+function pedirPrecompra(id, p) {
+  const key = id + ':' + (p || '');
+  S.solicitados[key] = true;
+  if (id === MI_TALLER) {
+    const v = p ? getVeh(p) : null;
+    S.leads.unshift({ fecha: HOY, tipo: 'Revisión precompra', veh: v ? nombreVeh(v) + ' ' + v.anio : 'Auto sin patente indicada', patente: p || '', origen: 'Un comprador te eligió desde la ficha en Bitácora.', nuevo: true });
+  }
+  guardar();
+  const li = $('#lista-talleres li[data-t="' + id + '"]');
+  if (li) li.outerHTML = tallerItem(id, p);
+  toast('Solicitud enviada a ' + TALLERES[id].nombre + ' (simulado)');
+}
+
+/* ================= Vista: automotora ================= */
+let aTab = 'stock', rPatente = '', rMsg = '', rIntento = '';
+function renov() { const d = new Date(); return fecha(toISO(new Date(d.getFullYear(), d.getMonth() + 1, 1))); }
+function usoHTML() {
+  const pl = planActual(), ilim = !isFinite(pl.consultas);
+  const pct = ilim ? 0 : clamp(S.usage / pl.consultas * 100, 0, 100);
+  return '<p class="uso-t">Consultas usadas este mes: <b>' + S.usage + (ilim ? ' · ilimitadas' : ' / ' + pl.consultas) + '</b></p>' +
+    (ilim ? '<p class="uso-s">Plan ' + pl.nombre + ': sin tope de consultas. El contador se reinicia el ' + renov() + '.</p>'
+      : '<div class="bar' + (pct >= 90 ? ' is-alto' : '') + '"><i style="width:' + pct + '%"></i></div><p class="uso-s">Se renuevan el ' + renov() + '</p>');
+}
+function viewAutomotora() {
+  const tab = (id, label) => '<button type="button" class="tab" role="tab" id="tab-' + id + '" aria-selected="' + (aTab === id) + '" aria-controls="a-panel" data-action="tab" data-tab="' + id + '">' + label + '</button>';
+  return '<section class="dash-head"><div><p class="eyebrow">' + ic('store') + 'Automotora</p><h1>Automotora Cordillera</h1>' +
+    '<p class="muted">Peñalolén · Plan ' + planActual().nombre + '</p></div>' +
+    '<div class="uso" id="a-uso">' + usoHTML() + '</div></section>' +
+    '<nav class="tabs" role="tablist" aria-label="Secciones de la automotora">' +
+    tab('stock', 'Mi stock <span class="count">' + STOCK.length + '</span>') + tab('retoma', '<span class="tab-largo">Evaluar retoma</span><span class="tab-corto">Retoma</span>') +
+    tab('insights', (planActual().insights ? ic('trend') : ic('lock')) + 'Insights') + tab('plan', 'Mi plan') + '</nav>' +
+    '<div id="a-panel" role="tabpanel">' + panelAuto() + '</div>';
+}
+const panelAuto = () => (aTab === 'retoma' ? panelRetoma() : aTab === 'plan' ? panelPlan() : aTab === 'insights' ? panelInsights() : panelStock());
+function refreshAuto() {
+  const panel = $('#a-panel'); if (!panel) return;
+  panel.innerHTML = panelAuto();
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === aTab)));
+  const uso = $('#a-uso'); if (uso) uso.innerHTML = usoHTML();
+}
+function estadoPills(v, a) {
+  return '<div class="pills">' + (a.evs.length ? '<span class="pill pill--con">Con Bitácora</span>' : '<span class="pill pill--sin">Sin historial</span>') +
+    (S.certified[v.patente] ? '<span class="pill pill--cert">' + ic('doc') + 'Certificado</span>' : '') + '</div>';
+}
+function idxHTML(a) {
+  const b = banda(a);
+  return '<div class="idx idx--' + b.cls + '"><div class="bar"><i style="width:' + a.score + '%"></i></div><b class="tx-' + b.cls + '">' + a.score + '</b></div>';
+}
+function accionesStock(v, a) {
+  const p = v.patente;
+  if (!a.evs.length) return '<button type="button" class="btn btn-ghost btn-sm" data-action="historial" data-p="' + p + '">Historial</button>' +
+    '<button type="button" class="btn btn-ghost btn-sm" data-action="talleres" data-p="' + p + '">Pedir revisión</button>';
+  return '<button type="button" class="btn btn-ghost btn-sm" data-action="historial" data-p="' + p + '">Historial</button>' +
+    '<button type="button" class="btn ' + (S.certified[p] ? 'btn-ghost' : 'btn-primary') + ' btn-sm" data-action="certificar" data-p="' + p + '">' + ic('doc') + (S.certified[p] ? 'Ver certificado' : 'Certificar') + '</button>';
+}
+function panelStock() {
+  const rows = STOCK.map(p => { const v = getVeh(p); return { v: v, a: analizar(v) }; });
+  const con = rows.filter(r => r.a.evs.length).length;
+  const prom = Math.round(rows.reduce((s, r) => s + r.a.score, 0) / rows.length);
+  const cert = rows.filter(r => S.certified[r.v.patente]).length;
+  return '<div class="stock-sum"><div><b>' + con + ' de ' + rows.length + '</b><span>autos con Bitácora</span></div>' +
+    '<div><b>' + prom + '</b><span>índice promedio del stock</span></div><div><b>' + cert + '</b><span>certificados emitidos</span></div></div>' +
+    '<div class="table-wrap"><table class="stock-table"><thead><tr><th>Patente</th><th>Modelo</th><th>Año</th><th>Precio publicado</th><th>Índice de trazabilidad</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + plateHTML(r.v.patente, 'sm') + '</td><td class="modelo"><b>' + esc(nombreVeh(r.v)) + '</b><span>' + esc(r.v.color) + '</span></td><td class="num">' + r.v.anio + '</td>' +
+      '<td class="num">' + clp(r.v.precio) + '</td><td>' + idxHTML(r.a) + '</td><td>' + estadoPills(r.v, r.a) + '</td><td><div class="acciones">' + accionesStock(r.v, r.a) + '</div></td></tr>').join('') +
+    '</tbody></table></div>' +
+    '<ul class="stock-cards">' + rows.map(r => '<li class="stock-card"><div class="sc-top">' + plateHTML(r.v.patente, 'sm') + '<div><b>' + esc(nombreVeh(r.v)) + ' ' + r.v.anio + '</b><span>' + esc(r.v.color) + '</span></div></div>' +
+      '<div class="sc-mid"><p class="sc-precio"><small>Precio publicado</small>' + clp(r.v.precio) + '</p><div><p class="uso-s">Índice de trazabilidad</p>' + idxHTML(r.a) + '</div></div>' +
+      '<div class="sc-bot">' + estadoPills(r.v, r.a) + '<div class="acciones">' + accionesStock(r.v, r.a) + '</div></div></li>').join('') + '</ul>';
+}
+function abrirHistorial(p) {
+  const v = getVeh(p);
+  openModal('Historial de ' + fmtP(p), fichaHTML(v, { unlocked: true, ctx: 'automotora' }), true);
+}
+
+function panelRetoma() {
+  return '<section class="retoma"><h2>Evaluar retoma</h2>' +
+    '<p class="muted retoma-intro">Ingresa la patente del auto que te ofrecen en parte de pago. Cada patente nueva usa 1 consulta de tu plan.</p>' +
+    '<form id="f-retoma" class="buscar-form" novalidate>' + plateInput('r-patente', rPatente) +
+    '<button class="btn btn-primary btn-lg" type="submit">' + ic('search') + 'Evaluar</button></form>' +
+    '<div class="ejemplos"><span>Retomas de ejemplo:</span>' + chipsHTML(EJ_RETOMA, 'evaluar') + '</div>' +
+    '<div id="r-res" aria-live="polite">' + (rMsg || (rPatente ? retomaRes(rPatente) : '')) + '</div></section>';
+}
+function evaluarRetoma(raw) {
+  const p = normP(raw), box = $('#r-res'); if (!box) return;
+  rMsg = '';
+  if (!p) { rPatente = ''; box.innerHTML = ''; return; }
+  if (!validP(p)) { rPatente = ''; rMsg = formatoMalHTML(raw); box.innerHTML = rMsg; return; }
+  const v = getVeh(p);
+  if (v && !S.evaluated[p]) {
+    const lim = planActual().consultas;
+    if (S.usage >= lim) {
+      rPatente = ''; rIntento = p;
+      rMsg = '<div class="veredicto veredicto--gap"><span class="alert-ic">' + ic('info') + '</span><div><p class="veredicto-t">Usaste las ' + lim + ' consultas de tu plan este mes</p>' +
+        '<p>Con Pro tienes consultas ilimitadas. Si sigues en ' + planActual().nombre + ', se renuevan el ' + renov() + '.</p>' +
+        '<div class="row" style="margin-top:10px"><button type="button" class="btn btn-primary" data-action="plan" data-id="pro">Cambiar a Pro</button><button type="button" class="btn btn-ghost" data-action="tab" data-tab="plan">Ver planes</button></div></div></div>';
+      box.innerHTML = rMsg; return;
+    }
+    S.usage++; S.evaluated[p] = true; guardar();
+    const uso = $('#a-uso'); if (uso) uso.innerHTML = usoHTML();
+    toast('Se usó 1 consulta de tu plan');
+  }
+  rPatente = p;
+  box.innerHTML = retomaRes(p);
+}
+function retomaRes(p) {
+  const v = getVeh(p);
+  if (!v) return '<div class="veredicto veredicto--gap"><span class="alert-ic">' + ic('alert') + '</span><div><p class="veredicto-t">Sin mantenciones documentadas: considera el riesgo en el precio de toma.</p>' +
+    '<p>No hay registros de ' + fmtP(p) + ' en Bitácora. Esta consulta no se descontó de tu plan.</p></div></div>';
+  const a = analizar(v);
+  let cls = 'gap', t, sub = '', razones = [];
+  if (!a.evs.length || a.mantCount === 0) {
+    t = 'Sin mantenciones documentadas: considera el riesgo en el precio de toma.';
+    sub = a.evs.length ? 'Hay registros, pero ninguna mantención respaldada.' : 'Este auto no tiene registros en Bitácora. Nada respalda cómo se cuidó.';
+  } else if (a.score >= 75 && !a.incons.length) {
+    cls = 'ok'; t = 'Historial documentado: respalda un mejor precio de venta.';
+    sub = 'Índice ' + a.score + '/100, con ' + a.nTaller + ' servicios verificados por talleres y ' + a.nPrt + ' revisiones técnicas. Al venderlo puedes emitir su Certificado Bitácora.';
+  } else {
+    t = 'Historial incompleto: considera el riesgo en el precio de toma.';
+    sub = 'Índice ' + a.score + '/100. Lo que falta:';
+    if (a.mant < 0.75) razones.push('Solo ' + a.mantCount + ' de ' + a.mantEsperadas + ' mantenciones esperadas están documentadas.');
+    a.gaps.forEach(g => razones.push(gapTexto(g, v) + ' (' + mesesTxt(g.meses) + ').'));
+    if (a.incons.length) razones.push('Kilometraje inconsistente: posible adulteración del odómetro.');
+    if (a.nDueno > a.nTaller) razones.push('La mayoría de los registros los declaró el dueño, sin respaldo.');
+  }
+  let extra = '';
+  a.siniestros.forEach(s => { extra += '<p class="veredicto-risk">' + ic('alert') + '<span>Siniestro registrado el ' + fecha(s.fecha) + ': revisa la reparación estructural y descuéntalo del precio de toma.</span></p>'; });
+  return '<div class="veredicto veredicto--' + cls + '"><span class="alert-ic">' + ic(cls === 'ok' ? 'shield' : 'alert') + '</span><div>' +
+    '<p class="veredicto-t">' + t + '</p><p>' + sub + '</p>' + (razones.length ? '<ul>' + razones.map(r => '<li>' + r + '</li>').join('') + '</ul>' : '') + extra + tomaHTML(v, a) + '</div></div>' +
+    fichaHTML(v, { unlocked: true, ctx: 'automotora' });
+}
+
+function panelPlan() {
+  const act = planActual();
+  return '<div class="planes">' + PLANES.map(pl => {
+    const actual = pl.id === act.id;
+    return '<article class="plan' + (actual ? ' plan--actual' : '') + '">' + (actual ? '<span class="plan-badge">Tu plan actual</span>' : '') +
+      '<h3>' + pl.nombre + '</h3><p class="plan-precio"><b>' + pl.uf + ' UF</b> <span>/ mes + IVA</span></p>' +
+      '<p class="plan-clp">≈ ' + clp(pl.uf * UF_REF) + ' al mes + IVA</p>' +
+      '<ul>' + pl.items.map(i => '<li>' + ic('check') + '<span>' + i + '</span></li>').join('') + '</ul>' +
+      (actual ? '<button type="button" class="btn btn-ghost btn-block" disabled>Plan actual</button>'
+        : '<button type="button" class="btn btn-' + (pl.uf > act.uf ? 'primary' : 'ghost') + ' btn-block" data-action="plan" data-id="' + pl.id + '">Cambiar a ' + pl.nombre + '</button>') +
+      '</article>';
+  }).join('') + '</div>' +
+  '<div class="suelto">' + ic('receipt') + '<p><b>Sin suscripción: informe suelto a ' + clp(PRECIO_INFORME) + ' por patente.</b></p></div>' +
+  '<p class="fine planes-nota">' + ic('info') + '<span>Pesos calculados con una UF de referencia de ' + clp(UF_REF) + '. Prototipo: el cambio de plan es simulado y no genera cobros.</span></p>';
+}
+
+/* Bitácora Insights (plan Pro, simulado): precios sugeridos y días en stock */
+const redondear = n => Math.round(n / 10000) * 10000;
+function valorRef(v) {
+  if (v.mercado) return { valor: v.mercado, estimado: false };
+  const edad = Math.max(0, new Date().getFullYear() - v.anio);
+  return { valor: Math.max(2500000, Math.round(14000000 * Math.pow(0.9, edad) / 100000) * 100000), estimado: true };
+}
+// Índice 0 → −12 %, índice 100 → +5 %; un siniestro registrado resta 8 %
+const factorIndice = a => (0.88 + 0.17 * a.score / 100) * (a.siniestros.length ? 0.92 : 1);
+function rangoPrecio(v, a, desde, hasta) { const c = valorRef(v).valor * factorIndice(a); return [redondear(c * desde), redondear(c * hasta)]; }
+const rangoVenta = (v, a) => rangoPrecio(v, a, 0.97, 1.03);
+const rangoToma = (v, a) => rangoPrecio(v, a, 0.80, 0.86);
+const rangoTxt = r => clp(r[0]) + ' – ' + clp(r[1]);
+const fechaIngreso = dias => { const d = new Date(); d.setDate(d.getDate() - dias); return fecha(toISO(d)); };
+
+function tomaHTML(v, a) {
+  if (!planActual().insights) {
+    return '<div class="toma toma--lock">' + ic('lock') + '<p>Precio de toma sugerido: disponible en Pro con Bitácora Insights.</p>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="plan" data-id="pro">Cambiar a Pro</button></div>';
+  }
+  const notas = ['según el índice ' + a.score + '/100'];
+  if (a.siniestros.length) notas.push('con −8 % por el siniestro');
+  if (valorRef(v).estimado) notas.push('sobre un valor de mercado estimado');
+  return '<div class="toma">' + ic('trend') + '<p><span>Precio de toma sugerido: <b>' + rangoTxt(rangoToma(v, a)) + '</b></span>' +
+    '<small>Bitácora Insights, ' + notas.join(', ') + '. Simulado.</small></p></div>';
+}
+function panelInsights() {
+  if (!planActual().insights) {
+    const pro = PLANES.find(x => x.id === 'pro');
+    return '<div class="card msg ins-lock"><span class="msg-ic">' + ic('lock') + '</span><div class="msg-body">' +
+      '<h2>Bitácora Insights es parte del plan Pro</h2>' +
+      '<p>Ve cuántos días lleva cada auto en stock, un rango de precio sugerido según su índice de trazabilidad y una alerta cuando un auto pasa los ' + DIAS_SOBRESTOCK + ' días sin venderse. En Evaluar retoma suma un precio de toma sugerido.</p>' +
+      '<div class="row"><button type="button" class="btn btn-primary btn-lg" data-action="plan" data-id="pro">Cambiar a Pro</button></div>' +
+      '<p class="fine">Pro: ' + pro.uf + ' UF al mes + IVA (≈ ' + clp(pro.uf * UF_REF) + '). Cambio simulado.</p></div></div>';
+  }
+  const rows = STOCK.map(p => { const v = getVeh(p), a = analizar(v); return { v: v, a: a, r: rangoVenta(v, a), dias: v.dias || 0 }; });
+  const sobre = rows.filter(x => x.dias > DIAS_SOBRESTOCK).length;
+  const prom = Math.round(rows.reduce((s, x) => s + x.dias, 0) / rows.length);
+  const sobreRango = rows.filter(x => x.v.precio > x.r[1]).length;
+  return '<div class="stock-sum"><div><b>' + prom + ' días</b><span>promedio en stock</span></div>' +
+    '<div><b class="' + (sobre ? 'tx-gap' : '') + '">' + sobre + '</b><span>con más de ' + DIAS_SOBRESTOCK + ' días</span></div>' +
+    '<div><b>' + sobreRango + '</b><span>sobre el rango sugerido</span></div></div>' +
+    '<ul class="ins-list">' + rows.map(insightItem).join('') + '</ul>' +
+    '<p class="fine planes-nota">' + ic('info') + '<span>Datos simulados. El rango parte de un valor de mercado de referencia del modelo y año, y se ajusta según el índice de trazabilidad: −12 % con índice 0 y +5 % con índice 100. Un siniestro registrado resta 8 %. En cada barra, la franja es el rango sugerido y la línea es el precio publicado.</span></p>';
+}
+function insightItem(x) {
+  const v = x.v, a = x.a, r = x.r, p = v.precio, sobre = x.dias > DIAS_SOBRESTOCK;
+  let pos, cls;
+  if (p > r[1]) { pos = 'Publicado sobre el rango sugerido: ' + (a.score < 50 ? 'suma historial o ajusta el precio.' : 'considera ajustar el precio.'); cls = 'gap'; }
+  else if (p < r[0]) { pos = 'Publicado bajo el rango sugerido: con este historial puedes subir el precio.'; cls = 'ok'; }
+  else { pos = 'Precio dentro del rango sugerido.'; cls = 'own'; }
+  const lo = Math.min(r[0], p) * 0.97, hi = Math.max(r[1], p) * 1.03, pct = n => (n - lo) / (hi - lo) * 100;
+  let consejo = '';
+  if (sobre) {
+    consejo = !a.evs.length ? 'Sin historial: una revisión en un taller Bitácora le daría respaldo.'
+      : S.certified[v.patente] ? 'Ya está certificado: revisa el precio frente al rango sugerido.'
+      : a.score < 50 ? 'Su historial incompleto puede estar frenando la venta.'
+      : 'Certificarlo y mostrar el historial puede acelerar la venta.';
+  }
+  return '<li class="ins-card">' +
+    '<div class="sc-top">' + plateHTML(v.patente, 'sm') + '<div><b>' + esc(nombreVeh(v)) + ' ' + v.anio + '</b><span>Índice ' + a.score + ' · ' + banda(a).t + '</span></div>' +
+    (sobre ? '<span class="pill pill--sobre">' + ic('clock') + 'Sobrestock</span>' : '') + '</div>' +
+    '<dl class="ins-dl"><div><dt>Días en stock</dt><dd' + (sobre ? ' class="tx-gap"' : '') + '>' + x.dias + '<small>desde ' + fechaIngreso(x.dias) + '</small></dd></div>' +
+    '<div><dt>Precio publicado</dt><dd>' + clp(p) + '</dd></div>' +
+    '<div class="ins-rango"><dt>Rango de precio sugerido</dt><dd>' + rangoTxt(r) + '</dd></div></dl>' +
+    '<div class="rbar" aria-hidden="true"><i style="left:' + pct(r[0]).toFixed(1) + '%;width:' + (pct(r[1]) - pct(r[0])).toFixed(1) + '%"></i><b style="left:' + pct(p).toFixed(1) + '%"></b></div>' +
+    '<p class="ins-pos ins-pos--' + cls + '">' + pos + '</p>' +
+    (sobre ? '<p class="ins-alert">' + ic('alert') + '<span>Lleva ' + x.dias + ' días en stock, más de ' + DIAS_SOBRESTOCK + '. ' + consejo + '</span></p>' : '') +
+    '</li>';
+}
+
+/* Certificado */
+function codigoCert(p) { return 'BTC-' + p + '-' + (hashStr(p + 'bitacora') % 65536).toString(16).toUpperCase().padStart(4, '0'); }
+function qrSVG(seed) {
+  const N = 25; let x = hashStr(seed) || 1;
+  const rnd = () => { x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; };
+  const enFinder = (r, c) => (r < 8 && c < 8) || (r < 8 && c >= N - 8) || (r >= N - 8 && c < 8);
+  let d = '';
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (!enFinder(r, c) && rnd() < 0.47) d += 'M' + c + ' ' + r + 'h1v1h-1z';
+  const f = (r, c) => 'M' + c + ' ' + r + 'h7v7h-7zM' + (c + 1) + ' ' + (r + 1) + 'v5h5v-5zM' + (c + 2) + ' ' + (r + 2) + 'h3v3h-3z';
+  return '<svg class="qr" viewBox="-2 -2 ' + (N + 4) + ' ' + (N + 4) + '" role="img" aria-label="Código QR de verificación (simulado)"><rect x="-2" y="-2" width="' + (N + 4) + '" height="' + (N + 4) + '" fill="#fff"/>' +
+    '<path fill="#0F2328" fill-rule="evenodd" d="' + f(0, 0) + f(0, N - 7) + f(N - 7, 0) + '"/><path fill="#0F2328" d="' + d + '"/></svg>';
+}
+function advertencias(v, a) {
+  const out = [];
+  a.siniestros.forEach(s => out.push({ risk: true, t: 'Siniestro registrado el ' + fecha(s.fecha) + ': ' + (s.resumen || s.desc) + '.' }));
+  a.incons.forEach(x => out.push({ risk: true, t: 'Kilometraje inconsistente: ' + kms(x.ev.km) + ' el ' + fecha(x.ev.fecha) + ', menos que ' + kms(x.prev.km) + ' el ' + fecha(x.prev.fecha) + '.' }));
+  a.gaps.forEach(g => out.push({ risk: false, t: gapTexto(g, v) + ' (' + mesesTxt(g.meses) + ').' }));
+  return out;
+}
+function certHTML(v, a) {
+  const code = codigoCert(v.patente), b = banda(a), adv = advertencias(v, a);
+  const ult = a.evs.slice(-5).reverse();
+  return '<div class="cert" id="cert">' +
+    '<header class="cert-head"><div class="cert-brand">' + logoMark + '<span>Bitácora</span></div><div class="cert-code"><small>Código de verificación</small><b>' + code + '</b></div></header>' +
+    '<h3 class="cert-title">Certificado de historial vehicular</h3>' +
+    '<div class="cert-veh">' + plateHTML(v.patente) + '<div><p class="cert-name">' + esc(nombreVeh(v)) + ' ' + v.anio + '</p><p>' + esc(v.color) + ' · Primera inscripción ' + fechaIns(v) + '</p></div></div>' +
+    '<div class="cert-grid"><div class="cert-indice"><span class="cert-score">' + a.score + '<small>/100</small></span><b>Índice de trazabilidad · ' + b.t + '</b>' +
+    '<small>Mide qué tan completo y verificado está el historial, no el estado mecánico.</small></div>' +
+    '<dl class="cert-dl"><div><dt>Registros</dt><dd>' + a.evs.length + '</dd></div><div><dt>Verificados por taller</dt><dd>' + a.nTaller + '</dd></div>' +
+    '<div><dt>Revisiones técnicas</dt><dd>' + a.nPrt + '</dd></div><div><dt>Último km registrado</dt><dd>' + kms(a.last.km) + ' <small>' + fecha(a.last.fecha) + '</small></dd></div>' +
+    '<div><dt>Siniestros registrados</dt><dd>' + (a.siniestros.length || 'Ninguno') + '</dd></div><div><dt>Períodos sin registro</dt><dd>' + (a.gaps.length || 'Ninguno') + '</dd></div></dl></div>' +
+    (adv.length ? '<div class="cert-adv"><b>Advertencias</b><ul>' + adv.map(x => '<li' + (x.risk ? ' class="risk"' : '') + '>' + esc(x.t) + '</li>').join('') + '</ul></div>'
+      : '<p class="cert-okline">Sin siniestros registrados, kilometraje consistente y sin períodos sin registros.</p>') +
+    '<div class="cert-tabla-wrap"><table class="cert-tabla"><caption>Últimos registros</caption><thead><tr><th>Fecha</th><th>Km</th><th>Tipo</th><th>Respaldo</th></tr></thead><tbody>' +
+    ult.map(e => '<tr><td>' + fecha(e.fecha) + '</td><td>' + kms(e.km) + '</td><td>' + TIPOS[e.tipo].label + '</td><td>' + SELLOS[e.sello].corto + '</td></tr>').join('') + '</tbody></table></div>' +
+    '<footer class="cert-foot">' + qrSVG(code) + '<div><p>Escanea el código para ver gratis el historial completo y actualizado de esta patente.</p>' +
+    '<p>Emitido el ' + fecha(S.certified[v.patente] || HOY) + ' para Automotora Cordillera. Refleja los registros disponibles a esa fecha.</p></div></footer></div>';
+}
+function textoPublicacion(v, a) {
+  const adv = advertencias(v, a);
+  return 'Auto con Certificado Bitácora\n' + nombreVeh(v) + ' ' + v.anio + ' · Patente ' + fmtP(v.patente) + '\n' +
+    'Índice de trazabilidad: ' + a.score + '/100 (' + banda(a).t + ')\n' +
+    regs(a.evs.length) + ': ' + a.nTaller + ' verificados por talleres y ' + revs(a.nPrt) + '.\n' +
+    'Último km registrado: ' + kms(a.last.km) + ' (' + fecha(a.last.fecha) + ').\n' +
+    (adv.length ? 'Advertencias: ' + adv.map(x => x.t).join(' ') + '\n' : 'Sin siniestros registrados y sin períodos sin registros.\n') +
+    'Historial completo gratis en Bitácora con el código de verificación ' + codigoCert(v.patente) + '.';
+}
+function certificar(p) {
+  const v = getVeh(p), a = analizar(v);
+  if (!a.evs.length) { toast('Este auto necesita al menos un registro para certificarse'); return; }
+  const nuevo = !S.certified[p];
+  if (nuevo) { S.certified[p] = HOY; guardar(); }
+  openModal('Certificado Bitácora', certHTML(v, a) +
+    '<div class="cert-actions">' +
+    (FRAMED ? '' : '<button type="button" class="btn btn-primary" data-action="imprimir">' + ic('print') + 'Imprimir o guardar PDF</button>') +
+    '<button type="button" class="btn ' + (FRAMED ? 'btn-primary' : 'btn-ghost') + '" data-action="copiar" data-p="' + p + '">' + ic('copy') + 'Copiar texto para la publicación</button></div>' +
+    '<p class="fine" style="margin-top:10px">' + ic('info') + '<span>' + (FRAMED ? 'Muestra esta vista al comprador desde el celular o tómale una captura para adjuntarla en la publicación.' : 'También puedes mostrar esta vista al comprador desde el celular.') + '</span></p>' +
+    '<div id="copy-fallback"></div>', true);
+  if (nuevo) { refreshAuto(); toast('Certificado emitido para ' + fmtP(p)); }
+}
+function copiarTexto(p) {
+  const v = getVeh(p), txt = textoPublicacion(v, analizar(v));
+  const fallback = () => {
+    const box = $('#copy-fallback'); if (!box) return;
+    box.innerHTML = '<label class="sr-only" for="copy-area">Texto para la publicación</label><textarea id="copy-area" class="cert-copy" readonly>' + esc(txt) + '</textarea>';
+    const ta = $('#copy-area'); ta.focus(); ta.select();
+    toast('Selecciona el texto y cópialo');
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast('Texto copiado: pégalo en tu publicación'), fallback);
+    else fallback();
+  } catch (e) { fallback(); }
+}
+function imprimir() {
+  const c = $('#cert'); if (!c) return;
+  $('#print-root').innerHTML = '<div class="cert">' + c.innerHTML + '</div>';
+  window.print();
+}
+
+/* ================= Vista: taller ================= */
+const tf = { start: null, tick: null, rec: null, recT: null, leyendo: false, timers: [] };
+function limpiarTaller() {
+  clearInterval(tf.tick); clearInterval(tf.rec); tf.timers.forEach(clearTimeout);
+  tf.start = null; tf.tick = null; tf.rec = null; tf.timers = []; tf.leyendo = false;
+}
+const derivados = () => 7 + S.leads.length;
+function viewTaller() {
+  const t = TALLERES[MI_TALLER];
+  return '<section class="dash-head"><div><p class="eyebrow">' + ic('wrench') + 'Taller adherido</p><h1>' + t.nombre + '</h1>' +
+    '<p class="muted">' + t.comuna + ' · Socio Bitácora desde ' + mesAnio(t.desde) + '</p></div>' +
+    '<p class="highlight">' + ic('users') + '<span>Este mes Bitácora te derivó <b id="h-deriv">' + derivados() + '</b> clientes</span></p></section>' +
+    '<div class="taller-grid"><section class="card reg" id="reg">' + regHTML() + '</section>' +
+    '<aside class="card ganas" id="ganas">' + ganasHTML() + '</aside>' +
+    '<section class="card registros" id="t-registros">' + registrosHTML() + '</section></div>';
+}
+const ejemplosT = () => '<span>Prueba con:</span>' + ['KZPW38', 'LFGH19', 'JXTR61'].map(p => '<button type="button" class="chip" data-action="t-ejemplo" data-p="' + p + '"><b>' + fmtP(p) + '</b><span>' + esc(nombreVeh(getVeh(p))) + '</span></button>').join('');
+function regHTML() {
+  return '<header class="reg-head"><div><h2>Registrar un servicio</h2><p class="muted">Patente, foto y confirmar. Menos de un minuto.</p></div>' +
+    '<span class="timer" id="t-timer" title="Tiempo desde que empezaste el registro">' + ic('clock') + '<span>0:00</span></span></header>' +
+    '<form id="f-reg" novalidate>' +
+    '<div class="step" id="st1"><p class="step-label"><span class="step-n">1</span><label for="t-patente">Patente del auto</label></p>' +
+    plateInput('t-patente', '') +
+    '<p class="hint" id="t-veh">' + ejemplosT() + '</p>' +
+    '<div id="t-nuevo" hidden><div class="fields">' +
+    '<label class="f">Marca<input id="t-marca" autocomplete="off" placeholder="Ej.: Chevrolet"></label>' +
+    '<label class="f">Modelo<input id="t-modelo" autocomplete="off" placeholder="Ej.: Spark"></label>' +
+    '<label class="f">Año<input id="t-anio" inputmode="numeric" maxlength="4" placeholder="Ej.: 2017"></label></div></div></div>' +
+    '<div class="step is-off" id="st2"><p class="step-label"><span class="step-n">2</span><span>Foto de la boleta u orden de trabajo</span></p>' +
+    '<div id="t-foto-area">' + fotoBtnHTML() + '</div>' +
+    '<input type="file" id="t-foto" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true"></div>' +
+    '<div class="step" id="st3" hidden><p class="step-label"><span class="step-n">3</span><span>Revisa y confirma</span></p>' +
+    '<p class="ai-note">' + ic('spark') + '<span>Completamos los campos destacados leyendo la foto. Revísalos y corrige lo que haga falta.</span></p>' +
+    '<div class="fields">' +
+    '<label class="f">Fecha<input id="t-fecha" inputmode="numeric" placeholder="dd-mm-aaaa" autocomplete="off"></label>' +
+    '<label class="f">Kilometraje<input id="t-km" inputmode="numeric" autocomplete="off"><span class="f-warn" id="t-km-warn" hidden></span></label>' +
+    '<label class="f">Tipo de servicio<select id="t-tipo"><option value="mant">Mantención</option><option value="rep">Reparación</option><option value="sin">Siniestro (choque o daño)</option></select></label>' +
+    '<label class="f">Monto total<input id="t-monto" inputmode="numeric" autocomplete="off"></label>' +
+    '<label class="f f--full">Trabajo realizado<textarea id="t-desc" rows="2"></textarea></label>' +
+    '<label class="f f--full">Repuestos <small>(uno por línea)</small><textarea id="t-rep" rows="3"></textarea></label>' +
+    '<div class="f f--full"><label for="t-nota">Nota para el historial <small>(opcional)</small></label><div class="voz" id="t-voz">' + vozBtnHTML() + '</div>' +
+    '<textarea id="t-nota" rows="2" placeholder="Ej.: pastillas al 30 %, cambiar en la próxima visita"></textarea></div>' +
+    '</div><p class="form-err" id="t-err" role="alert" hidden></p>' +
+    '<button type="submit" class="btn btn-primary btn-lg btn-block reg-submit">' + ic('shield') + 'Confirmar y registrar</button></div>' +
+    '</form><div id="t-exito" hidden></div>';
+}
+const fotoBtnHTML = () => '<label class="upload" id="t-upload" for="t-foto">' + ic('camera') + '<span><b>Subir foto de boleta u orden de trabajo</b><small>Toma la foto con el celular o elige una imagen</small></span></label>' +
+  '<button type="button" class="link-btn" data-action="t-foto-ejemplo">No tengo una a mano: usar una orden de ejemplo</button>';
+const vozBtnHTML = hecha => '<button type="button" class="btn btn-ghost btn-sm" data-action="t-dictar">' + ic('mic') + (hecha ? 'Dictar otra nota' : 'Dictar nota de voz') + '</button>';
+
+function iniciarTimer() {
+  if (tf.start) return;
+  tf.start = Date.now();
+  const el = $('#t-timer'); if (el) el.classList.add('is-run');
+  tf.tick = setInterval(() => {
+    const s = $('#t-timer span'); if (!s) { clearInterval(tf.tick); return; }
+    s.textContent = fmtT(Date.now() - tf.start);
+  }, 1000);
+}
+function fmtT(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + pad(s % 60); }
+function pararTimer() {
+  clearInterval(tf.tick); tf.tick = null;
+  const el = $('#t-timer'); if (el) el.classList.remove('is-run');
+  return tf.start ? Date.now() - tf.start : 0;
+}
+const tPatente = () => normP(($('#t-patente') || {}).value);
+function actualizarTVeh() {
+  const p = tPatente(), box = $('#t-veh'), nuevo = $('#t-nuevo'), st1 = $('#st1'), st2 = $('#st2');
+  if (!box) return;
+  const ok = validP(p);
+  st2.classList.toggle('is-off', !ok); st1.classList.toggle('is-done', ok);
+  if (!p) { box.innerHTML = ejemplosT(); nuevo.hidden = true; return; }
+  if (!ok) { box.innerHTML = '<span class="muted">Sigue escribiendo: 4 letras y 2 números (AB·CD·12) o 2 letras y 4 números (AB·12·34).</span>'; nuevo.hidden = true; return; }
+  const v = getVeh(p);
+  if (v) {
+    const a = analizar(v);
+    box.innerHTML = '<span class="tveh">' + ic('car') + '<span><b>' + esc(nombreVeh(v)) + ' ' + v.anio + '</b> · ' + esc(v.color) +
+      (a.evs.length ? ' · último registro: ' + kms(a.last.km) + ' el ' + fecha(a.last.fecha) : ' · aún sin registros en Bitácora') + '</span></span>';
+    nuevo.hidden = true;
+  } else {
+    box.innerHTML = '<span class="tveh tveh--nuevo">' + ic('info') + '<span>Auto nuevo en Bitácora: con este registro se crea su expediente. Completa marca, modelo y año.</span></span>';
+    nuevo.hidden = false;
+  }
+}
+function propuestaIA(p) {
+  const v = getVeh(p), evs = v ? eventosDe(p) : [];
+  const lastKm = evs.length ? Math.max.apply(null, evs.map(e => e.km)) : 0;
+  const h = hashStr(p);
+  const km = Math.round((lastKm ? lastKm + 9300 + (h % 600) : 45000 + (h % 9000)) / 10) * 10;
+  const hito = Math.max(10000, Math.round(km / 10000) * 10000);
+  const rep = [[ACEITE, 42990], ['Filtro de aceite', 8990], ['Filtro de aire', 12990]];
+  if ((hito / 10000) % 2 === 0) rep.push(['Filtro de polen', 14990]);
+  if (hito % 40000 === 0) rep.push(['Bujías (4)', 39990]);
+  const mano = 25000;
+  const total = rep.reduce((s, r) => s + r[1], 0) + mano;
+  let veh = v ? nombreVeh(v) + ' ' + v.anio : [($('#t-marca') || {}).value, ($('#t-modelo') || {}).value, ($('#t-anio') || {}).value].filter(Boolean).join(' ');
+  return { km: km, hito: hito, rep: rep, mano: mano, total: total, veh: veh, desc: 'Mantención de ' + miles(hito) + ' km: cambio de aceite y filtros, revisión de frenos, niveles y luces.' };
+}
+function otSVG(p, d) {
+  const xe = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const items = d.rep.concat([['Mano de obra', d.mano]]);
+  const y0 = 200, lh = 19;
+  const lines = items.map((it, i) => '<text x="22" y="' + (y0 + i * lh) + '">' + xe(it[0]) + '</text><text x="278" y="' + (y0 + i * lh) + '" text-anchor="end">' + clp(it[1]) + '</text>').join('');
+  const yt = y0 + items.length * lh + 12;
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" font-family="Courier New, Courier, monospace" font-size="10.5" fill="#1d2a2f">' +
+    '<rect width="300" height="400" fill="#fbfaf5"/><rect x="10" y="10" width="280" height="380" fill="none" stroke="#c4ccce"/>' +
+    '<text x="22" y="36" font-size="12" font-weight="700">TALLER MECÁNICO HNOS. SOTO</text><text x="22" y="52">Ñuñoa · Santiago</text>' +
+    '<text x="22" y="80" font-size="12.5" font-weight="700">ORDEN DE TRABAJO N° ' + (4800 + (hashStr(p) % 190)) + '</text>' +
+    '<line x1="22" y1="90" x2="278" y2="90" stroke="#9aa5a8" stroke-dasharray="3 3"/>' +
+    '<text x="22" y="108">Fecha:     ' + fecha(HOY) + '</text><text x="22" y="125">Patente:   ' + fmtP(p) + '</text>' +
+    '<text x="22" y="142">Vehículo:  ' + xe(d.veh || '—') + '</text><text x="22" y="159">Km:        ' + miles(d.km) + '</text>' +
+    '<line x1="22" y1="172" x2="278" y2="172" stroke="#9aa5a8" stroke-dasharray="3 3"/><text x="22" y="186" font-weight="700">DETALLE</text>' + lines +
+    '<line x1="22" y1="' + (yt - 12) + '" x2="278" y2="' + (yt - 12) + '" stroke="#9aa5a8"/>' +
+    '<text x="22" y="' + (yt + 4) + '" font-size="12" font-weight="700">TOTAL</text><text x="278" y="' + (yt + 4) + '" font-size="12" font-weight="700" text-anchor="end">' + clp(d.total) + '</text>' +
+    '<path d="M36 356c10-16 22 6 34-6s18 10 30-3 14 4 22-2" stroke="#2b4a8a" fill="none" stroke-width="1.6"/><text x="36" y="376" font-size="9">Firma y timbre</text>' +
+    '<circle cx="236" cy="352" r="22" fill="none" stroke="#b5483f" stroke-width="1.4" opacity=".7"/><text x="236" y="355" font-size="7" text-anchor="middle" fill="#b5483f" opacity=".8">PAGADO</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function puedeFoto() {
+  const p = tPatente();
+  if (!validP(p)) return false;
+  if (!getVeh(p)) {
+    const marca = $('#t-marca').value.trim(), modelo = $('#t-modelo').value.trim(), anio = parseNum($('#t-anio').value);
+    if (!marca || !modelo || !anio) return 'datos';
+  }
+  return true;
+}
+function avisarFoto(motivo) {
+  if (motivo === 'datos') { toast('Completa marca, modelo y año del auto'); const m = $('#t-marca'); if (m && !m.value) m.focus(); }
+  else { toast('Primero ingresa la patente del auto'); const i = $('#t-patente'); if (i) i.focus(); }
+}
+function leerFoto(url) {
+  if (tf.leyendo) return;
+  iniciarTimer();
+  tf.leyendo = true;
+  const p = tPatente(), d = propuestaIA(p);
+  const area = $('#t-foto-area');
+  $('#st3').hidden = true;
+  area.innerHTML = '<div class="ot-wrap"><div class="ot-prev"><img src="' + url + '" alt="Foto de la orden de trabajo"><span class="scanline"></span></div>' +
+    '<div class="leyendo"><span class="spin"></span><div><b>Leyendo la orden de trabajo…</b><small id="t-paso">Detectando fecha y kilometraje</small></div></div></div>';
+  const paso = txt => { const el = $('#t-paso'); if (el) el.textContent = txt; };
+  tf.timers.push(setTimeout(() => paso('Identificando repuestos'), 700));
+  tf.timers.push(setTimeout(() => paso('Calculando el monto'), 1400));
+  tf.timers.push(setTimeout(() => {
+    tf.leyendo = false;
+    if (!$('#t-foto-area')) return;
+    area.innerHTML = '<div class="ot-wrap"><div class="ot-prev"><img src="' + url + '" alt="Foto de la orden de trabajo"></div>' +
+      '<div class="ot-ok"><b>' + ic('check') + 'Orden leída</b><small class="muted">' + d.rep.length + ' repuestos, mano de obra y total detectados</small>' +
+      '<label class="link-btn" for="t-foto">Cambiar foto</label></div></div>';
+    $('#st2').classList.add('is-done');
+    const set = (id, val) => { const el = $('#' + id); el.value = val; el.classList.add('ai'); el.classList.remove('is-err'); };
+    set('t-fecha', fecha(HOY)); set('t-km', miles(d.km)); set('t-tipo', 'mant'); set('t-monto', clp(d.total));
+    set('t-desc', d.desc); set('t-rep', d.rep.map(r => r[0]).join('\n'));
+    $('#t-err').hidden = true;
+    revisarKm();
+    const st3 = $('#st3'); st3.hidden = false;
+    scrollToEl(st3);
+  }, 2000));
+}
+function revisarKm() {
+  const w = $('#t-km-warn'); if (!w) return;
+  const p = tPatente(), v = getVeh(p), km = parseNum($('#t-km').value);
+  if (!v || !km) { w.hidden = true; return; }
+  const a = analizar(v);
+  if (a.evs.length && km < a.maxKm) { w.textContent = 'Es menor al último registro (' + kms(a.maxKm) + '). Revisa el odómetro antes de confirmar.'; w.hidden = false; }
+  else w.hidden = true;
+}
+function dictar() {
+  const box = $('#t-voz'); if (!box || tf.rec) return;
+  iniciarTimer();
+  let s = 0;
+  box.innerHTML = '<div class="rec" role="status"><span class="rec-dot" aria-hidden="true"></span><span class="rec-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span id="t-rec-t">0:00</span>' +
+    '<button type="button" class="btn btn-ghost btn-sm" data-action="t-parar">Detener</button></div>';
+  tf.rec = setInterval(() => { s++; const t = $('#t-rec-t'); if (t) t.textContent = '0:' + pad(s); if (s >= 4) pararDictado(); }, 1000);
+}
+function pararDictado() {
+  clearInterval(tf.rec); tf.rec = null;
+  const box = $('#t-voz'); if (!box) return;
+  box.innerHTML = '<div class="rec"><span class="spin spin--sm"></span><span>Transcribiendo nota de voz…</span></div>';
+  tf.timers.push(setTimeout(() => {
+    const ta = $('#t-nota'), b = $('#t-voz'); if (!ta || !b) return;
+    const nota = 'Pastillas de freno delanteras al 30 %, recomendar cambio en la próxima visita. Neumáticos en buen estado.';
+    ta.value = ta.value.trim() ? ta.value.trim() + ' ' + nota : nota;
+    ta.classList.add('ai');
+    b.innerHTML = vozBtnHTML(true);
+  }, 900));
+}
+function errReg(msg, id) {
+  const e = $('#t-err'); e.innerHTML = ic('alert') + '<span>' + msg + '</span>'; e.hidden = false;
+  if (id) { const el = $('#' + id); if (el) { el.classList.add('is-err'); el.focus(); } }
+}
+function confirmarRegistro() {
+  $$('#f-reg .is-err').forEach(el => el.classList.remove('is-err'));
+  $('#t-err').hidden = true;
+  const p = tPatente();
+  if (!validP(p)) return errReg('Revisa la patente: debe tener el formato AB·CD·12 o AB·12·34.', 't-patente');
+  let v = getVeh(p), creado = null;
+  if (!v) {
+    const marca = $('#t-marca').value.trim(), modelo = $('#t-modelo').value.trim(), anio = parseNum($('#t-anio').value);
+    const maxAnio = new Date().getFullYear() + 1;
+    if (!marca) return errReg('Falta la marca del auto.', 't-marca');
+    if (!modelo) return errReg('Falta el modelo del auto.', 't-modelo');
+    if (!anio || anio < 1980 || anio > maxAnio) return errReg('Revisa el año del auto (entre 1980 y ' + maxAnio + ').', 't-anio');
+    creado = { patente: p, marca: marca, modelo: modelo, anio: anio, color: 'Sin informar', inscripcion: anio + '-01-01', insAprox: true };
+  }
+  const f = parseFecha($('#t-fecha').value);
+  if (!f) return errReg('Revisa la fecha: usa el formato dd-mm-aaaa.', 't-fecha');
+  if (f > HOY) return errReg('La fecha no puede ser posterior a hoy.', 't-fecha');
+  const km = parseNum($('#t-km').value);
+  if (!km) return errReg('Ingresa el kilometraje que marca el odómetro.', 't-km');
+  const desc = $('#t-desc').value.trim();
+  if (!desc) return errReg('Describe el trabajo realizado.', 't-desc');
+  const antes = v ? analizar(v).score : 0;
+  if (creado) { S.extraVeh[p] = creado; v = creado; }
+  const tipo = $('#t-tipo').value;
+  const ev = {
+    id: 'n' + Date.now(), fecha: f, km: km, tipo: tipo, sello: 'taller', taller: MI_TALLER, desc: desc,
+    rep: $('#t-rep').value.split('\n').map(s => s.trim()).filter(Boolean), monto: parseNum($('#t-monto').value),
+    nota: $('#t-nota').value.trim() || null, nuevo: true, creado: Date.now()
+  };
+  if (tipo === 'sin') ev.resumen = desc.replace(/\.$/, '');
+  if (!S.extra[p]) S.extra[p] = [];
+  S.extra[p].push(ev);
+  S.registrosMes++;
+  guardar();
+  const despues = analizar(v).score;
+  const ms = pararTimer();
+  $('#f-reg').hidden = true;
+  const ex = $('#t-exito');
+  ex.innerHTML = '<div class="exito"><span class="exito-ic">' + ic('check') + '</span>' +
+    '<h2>Servicio registrado' + (ms ? ' en ' + fmtT(ms) : '') + '</h2>' +
+    '<div class="exito-veh">' + plateHTML(p, 'sm') + '<span>' + esc(nombreVeh(v)) + ' ' + v.anio + '</span></div>' +
+    '<p>Ya aparece en el historial del auto con el sello ' + selloHTML('taller') + '</p>' +
+    '<p class="exito-idx">Índice de trazabilidad: <b>' + antes + '</b> → <b class="tx-ok">' + despues + '</b></p>' +
+    '<div class="row"><button type="button" class="btn btn-primary" data-action="ver-como" data-rol="comprador" data-p="' + p + '">' + ic('search') + 'Ver como comprador</button>' +
+    '<button type="button" class="btn btn-ghost" data-action="ver-como" data-rol="automotora" data-p="' + p + '">' + ic('store') + 'Ver como automotora</button></div>' +
+    '<button type="button" class="link-btn" data-action="t-otro">Registrar otro servicio</button></div>';
+  ex.hidden = false;
+  $('#t-timer').innerHTML = ic('clock') + '<span>' + fmtT(ms) + '</span>';
+  scrollToEl($('#reg'));
+  const g = $('#ganas'); if (g) g.innerHTML = ganasHTML();
+  const r = $('#t-registros'); if (r) r.innerHTML = registrosHTML();
+}
+function ganasHTML() {
+  const leads = S.leads.concat(LEADS_BASE).slice(0, 4);
+  return '<h2>Lo que ganas con Bitácora</h2>' +
+    '<div class="ganas-hero"><b>' + derivados() + '</b><div><p class="ganas-t">clientes derivados este mes</p><p>Llegaron a tu taller desde una consulta en Bitácora.</p></div></div>' +
+    '<ul class="ganas-list">' +
+    '<li>' + ic('star') + '<div><b>Taller recomendado en ' + TALLERES[MI_TALLER].comuna + '</b><span>Apareces 2° en “Talleres Bitácora cerca” para los compradores de tu zona.</span></div></li>' +
+    '<li>' + ic('receipt') + '<div><b>' + S.registrosMes + ' servicios registrados este mes</b><span>Cada registro deja tu nombre en el historial del auto.</span></div></li></ul>' +
+    '<p class="ganas-msg">Registrar te trae clientes: cuando un auto que atendiste se vende, el nuevo dueño ve quién lo cuidó y vuelve a tu taller.</p>' +
+    '<h3 class="mini-h">Solicitudes recientes</h3><ul class="leads">' +
+    leads.map(l => '<li class="lead-it"><b>' + esc(l.tipo) + (l.nuevo ? '<span class="nuevo">Nuevo</span>' : '') + '</b><span>' + esc(l.veh) + (l.patente ? ' · ' + fmtP(l.patente) : '') + ' · ' + fecha(l.fecha) + '</span><span>' + esc(l.origen) + '</span></li>').join('') +
+    '</ul>';
+}
+function registrosHTML() {
+  const out = [], vistos = {};
+  Object.keys(BASE).concat(Object.keys(S.extra), Object.keys(S.extraVeh)).forEach(p => {
+    if (vistos[p]) return; vistos[p] = true;
+    eventosDe(p).forEach(e => { if (e.taller === MI_TALLER) out.push({ p: p, e: e }); });
+  });
+  out.sort((x, y) => (y.e.fecha < x.e.fecha ? -1 : y.e.fecha > x.e.fecha ? 1 : (y.e.creado || 0) - (x.e.creado || 0)));
+  return '<h2>Mis últimos registros</h2><ul class="reg-list">' + out.slice(0, 6).map(o => {
+    const v = getVeh(o.p);
+    return '<li class="reg-it">' + plateHTML(o.p, 'sm') + '<div class="ri-main"><b>' + esc(v ? nombreVeh(v) : '') + (o.e.nuevo ? '<span class="nuevo">Nuevo</span>' : '') + '</b><span>' + TIPOS[o.e.tipo].label + ' · ' + kms(o.e.km) + '</span></div>' +
+      '<div class="ri-side">' + (o.e.monto != null ? '<b>' + clp(o.e.monto) + '</b>' : '') + fecha(o.e.fecha) + '</div></li>';
+  }).join('') + '</ul>';
+}
+function resetRegistro() {
+  limpiarTaller();
+  const r = $('#reg'); if (r) r.innerHTML = regHTML();
+  const i = $('#t-patente'); if (i) i.focus();
+}
+
+/* ================= Navegación ================= */
+const VISTAS = ['comprador', 'automotora', 'taller'];
+let vista = 'inicio', pendiente = null;
+function route() {
+  const h = location.hash.replace('#', '');
+  vista = VISTAS.indexOf(h) >= 0 ? h : 'inicio';
+  limpiarTaller();
+  closeModal();
+  document.body.classList.remove('has-paybar');
+  const app = $('#app');
+  app.innerHTML = vista === 'comprador' ? viewComprador() : vista === 'automotora' ? viewAutomotora() : vista === 'taller' ? viewTaller() : viewInicio();
+  document.body.dataset.vista = vista;
+  $$('.seg button').forEach(b => { if (b.dataset.go === vista) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  window.scrollTo(0, 0);
+  const pend = pendiente; pendiente = null;
+  if (vista === 'comprador') {
+    if (pend && pend.p) { cPatente = pend.p; $('#c-patente').value = fmtP(pend.p); }
+    if (cPatente) mostrarComprador(cPatente);
+    if (pend && pend.p) { const n = $('.ev--nuevo') || $('#c-res'); setTimeout(() => scrollToEl(n), 60); }
+  } else if (vista === 'automotora' && pend && pend.p) {
+    if (STOCK.indexOf(pend.p) >= 0) { aTab = 'stock'; refreshAuto(); abrirHistorial(pend.p); }
+    else { aTab = 'retoma'; refreshAuto(); $('#r-patente').value = fmtP(pend.p); evaluarRetoma(pend.p); setTimeout(() => scrollToEl($('#r-res')), 60); }
+  }
+  app.focus({ preventScroll: true });
+}
+function irA(rol, p) {
+  pendiente = p ? { p: p } : null;
+  if (location.hash === '#' + rol) route(); else location.hash = rol;
+}
+
+/* ================= Eventos ================= */
+document.addEventListener('click', ev => {
+  const t = ev.target;
+  if (t.closest('[data-close]')) { closeModal(); return; }
+  const up = t.closest('#t-upload');
+  if (up) { const ok = puedeFoto(); if (ok !== true) { ev.preventDefault(); avisarFoto(ok); } else iniciarTimer(); return; }
+  const go = t.closest('[data-go]');
+  if (go) { irA(go.dataset.go); return; }
+  const el = t.closest('[data-action]'); if (!el) return;
+  const d = el.dataset;
+  switch (d.action) {
+    case 'buscar': $('#c-patente').value = fmtP(d.p); mostrarComprador(d.p); break;
+    case 'limpiar': { const i = $('#c-patente'); i.value = ''; mostrarComprador(''); i.focus(); break; }
+    case 'pago': abrirPago(d.p); break;
+    case 'pagar': pagar(d.p, el); break;
+    case 'ver-completo': closeModal(); mostrarComprador(d.p); setTimeout(() => scrollToEl($('.hist')), 40); break;
+    case 'talleres': abrirTalleres(d.p); break;
+    case 'precompra': pedirPrecompra(d.t, d.p); break;
+    case 'tab': aTab = d.tab; closeModal(); refreshAuto(); break;
+    case 'historial': abrirHistorial(d.p); break;
+    case 'certificar': certificar(d.p); break;
+    case 'copiar': copiarTexto(d.p); break;
+    case 'imprimir': imprimir(); break;
+    case 'evaluar': $('#r-patente').value = fmtP(d.p); evaluarRetoma(d.p); break;
+    case 'plan': {
+      S.plan = d.id; rMsg = ''; guardar();
+      const app = $('#app'); app.innerHTML = viewAutomotora();
+      if (aTab === 'retoma' && rIntento) { const p = rIntento; rIntento = ''; $('#r-patente').value = fmtP(p); evaluarRetoma(p); }
+      toast('Ahora tienes el plan ' + planActual().nombre + ' (simulado)');
+      break;
+    }
+    case 't-ejemplo': { const i = $('#t-patente'); i.value = fmtP(d.p); iniciarTimer(); actualizarTVeh(); break; }
+    case 't-foto-ejemplo': {
+      if (!$('#t-patente').value.trim()) { $('#t-patente').value = fmtP('KZPW38'); actualizarTVeh(); }
+      const ok = puedeFoto(); if (ok !== true) { avisarFoto(ok); break; }
+      const p = tPatente(); leerFoto(otSVG(p, propuestaIA(p))); break;
+    }
+    case 't-dictar': dictar(); break;
+    case 't-parar': pararDictado(); break;
+    case 't-otro': resetRegistro(); break;
+    case 'ver-como': closeModal(); irA(d.rol, d.p); break;
+    case 'reset': {
+      const label = $('span', el);
+      if (!el.dataset.armed) {
+        el.dataset.armed = '1'; label.textContent = 'Toca de nuevo para confirmar';
+        setTimeout(() => { delete el.dataset.armed; label.textContent = 'Reiniciar demo'; }, 4000);
+        break;
+      }
+      delete el.dataset.armed; label.textContent = 'Reiniciar demo';
+      S = estadoInicial();
+      try { localStorage.removeItem(KEY); } catch (e) { /* ignorar */ }
+      cPatente = ''; rPatente = ''; rMsg = ''; rIntento = ''; aTab = 'stock';
+      route(); toast('Demo reiniciada: se borraron los cambios de esta sesión');
+      break;
+    }
+  }
+});
+document.addEventListener('submit', ev => {
+  const f = ev.target; ev.preventDefault();
+  if (f.id === 'f-buscar') mostrarComprador($('#c-patente').value);
+  else if (f.id === 'f-retoma') evaluarRetoma($('#r-patente').value);
+  else if (f.id === 'f-reg') confirmarRegistro();
+});
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t.matches('.plate-input input')) {
+    const f = fmtP(t.value); if (t.value !== f) t.value = f;
+    if (t.id === 't-patente') { iniciarTimer(); actualizarTVeh(); }
+  }
+  if (t.classList.contains('ai')) t.classList.remove('ai');
+  if (t.classList.contains('is-err')) t.classList.remove('is-err');
+  if (t.id === 't-km') revisarKm();
+});
+document.addEventListener('focusout', ev => {
+  const t = ev.target;
+  if (t.id === 't-km' || t.id === 't-monto') {
+    const n = parseNum(t.value);
+    if (n != null) t.value = t.id === 't-km' ? miles(n) : clp(n);
+  }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.id === 't-foto' && t.files && t.files[0]) {
+    const ok = puedeFoto();
+    if (ok !== true) { avisarFoto(ok); t.value = ''; return; }
+    leerFoto(URL.createObjectURL(t.files[0]));
+    t.value = '';
+  }
+});
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeModal(); });
+window.addEventListener('hashchange', route);
+route();
+})();
+</script>
+
+</body></html>
